@@ -28,7 +28,7 @@ struct AddTicketView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 } header: {
-                    Text("Start with the ticket (S3)")
+                    Text("Start with the ticket")
                 }
 
                 Section {
@@ -39,7 +39,7 @@ struct AddTicketView: View {
                     TextField("Plate", text: $plate)
                     TextField("Code", text: $code)
                 } header: {
-                    Text("Or type the details (S4)")
+                    Text("Or type the details")
                 } footer: {
                     Text("We need the issue date to calculate your deadline. Deadlines: pay the discounted fine within \(DeadlineRules.discountWindowDays) days, contest within \(DeadlineRules.contestWindowDays) days. The discounted fine is only for Detroit residents with a plate registered in the City's Detroit Discount program.")
                 }
@@ -53,19 +53,21 @@ struct AddTicketView: View {
                     .pickerStyle(.inline)
                     .labelsHidden()
                 } header: {
-                    Text("The one question (S5)")
+                    Text("The one question")
                 } footer: {
                     Text("When this ticket was written, had you paid for parking?")
                 }
 
                 Section {
                     GlassPrimaryButton(title: "Check my case", systemImage: "checkmark.shield.fill") {}
-                    Text("Stub: saving and the case check (S6) port in the next pass. Nothing is saved from this screen yet.")
+                    Text("Saving and the case check arrive in the next update. Nothing is saved from this screen yet.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
             }
             .navigationTitle("Add Ticket")
+            .navigationBarTitleDisplayMode(.inline)
+            .contentMargins(.bottom, 110)
         }
     }
 }

@@ -47,27 +47,30 @@ struct StubScreenView: View {
     let stub: ScreenStub
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                GlassPanel(tint: .brass) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Label("Stub screen", systemImage: "hammer.fill")
-                            .font(.headline)
-                        Text("\(stub.screenID), \(stub.title)")
-                            .font(.title3.weight(.bold))
+        ZStack {
+            Color.ivory.opacity(0.55).ignoresSafeArea()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    GlassPanel(tint: .brass) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Stub screen", systemImage: "hammer.fill")
+                                .font(.headline)
+                            Text("\(stub.screenID), \(stub.title)")
+                                .font(.title3.weight(.bold))
+                        }
                     }
+                    IvoryCard {
+                        Text(stub.note)
+                            .font(.subheadline)
+                    }
+                    Text("This screen is a placeholder in the native scaffold. It ports screen by screen from the approved design, with approval at each stage, the same process the web version followed.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
-                IvoryCard {
-                    Text(stub.note)
-                        .font(.subheadline)
-                }
-                Text("This screen is a placeholder in the native scaffold. It ports screen by screen from the approved design, with approval at each stage, the same process the web version followed.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                .padding()
             }
-            .padding()
+            .contentMargins(.bottom, 110)
         }
-        .background(Color.ivory.opacity(0.55))
         .navigationTitle(stub.title)
         .navigationBarTitleDisplayMode(.inline)
     }

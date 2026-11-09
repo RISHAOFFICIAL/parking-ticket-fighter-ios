@@ -15,21 +15,25 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    header
+            ZStack {
+                Color.ivory.opacity(0.55).ignoresSafeArea()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        header
 
-                    if tickets.isEmpty {
-                        emptyState
-                    } else {
-                        summaryPanel
-                        openTicketList
+                        if tickets.isEmpty {
+                            emptyState
+                        } else {
+                            summaryPanel
+                            openTicketList
+                        }
                     }
+                    .padding()
                 }
-                .padding()
+                .contentMargins(.bottom, 110)
             }
-            .background(Color.ivory.opacity(0.55))
             .navigationTitle("Parking Ticket Fighter")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 

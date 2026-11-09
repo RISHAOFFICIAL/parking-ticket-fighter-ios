@@ -40,6 +40,7 @@ struct TicketListView: View {
                         }
                     }
                     .listStyle(.insetGrouped)
+                    .contentMargins(.bottom, 110)
                 }
             }
             .navigationTitle("My Tickets")

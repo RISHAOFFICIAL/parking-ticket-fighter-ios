@@ -61,7 +61,7 @@ enum SampleData {
         number: "Y18973750",
         issueDate: date(2026, 10, 6, 11, 2),
         zone: "105",
-        location: "Zone 105 metered parking",
+        location: "metered parking",
         plate: "7PAC20",
         code: "821",
         fineNow: 22.50,

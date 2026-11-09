@@ -8,18 +8,21 @@ struct TicketDetailView: View {
     let ticket: Ticket
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                verdictPanel
-                factsCard
-                deadlinesCard
-                statementCard
-                evidenceCard
-                filingCard
+        ZStack {
+            Color.ivory.opacity(0.55).ignoresSafeArea()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    verdictPanel
+                    factsCard
+                    deadlinesCard
+                    statementCard
+                    evidenceCard
+                    filingCard
+                }
+                .padding()
             }
-            .padding()
+            .contentMargins(.bottom, 110)
         }
-        .background(Color.ivory.opacity(0.55))
         .navigationTitle(ticket.number)
         .navigationBarTitleDisplayMode(.inline)
     }
