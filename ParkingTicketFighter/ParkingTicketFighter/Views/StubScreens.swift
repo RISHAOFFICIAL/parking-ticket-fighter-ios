@@ -14,6 +14,8 @@ import SwiftUI
 /// then tracking (S13 to S15), then duplicate review (S16), then the
 /// fleet flow (S17 to S21). Photo reading and AI features port last,
 /// and only once each is verified, matching the web build's limits.
+///
+/// Editorial Brief: paper white, ruled panels, small caps, no glass.
 struct ScreenStub: Identifiable {
     let screenID: String
     let title: String
@@ -48,28 +50,27 @@ struct StubScreenView: View {
 
     var body: some View {
         ZStack {
-            Color.ivory.opacity(0.55).ignoresSafeArea()
+            Color.paper.ignoresSafeArea()
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    IvoryCard {
+                    BriefPanel {
                         VStack(alignment: .leading, spacing: 6) {
-                            Label("Stub screen", systemImage: "hammer.fill")
-                                .font(.headline)
+                            Kicker(text: "Stub screen")
                             Text("\(stub.screenID), \(stub.title)")
-                                .font(.title3.weight(.bold))
+                                .font(.briefHeadline(24, relativeTo: .title2))
                         }
                     }
-                    IvoryCard {
+                    BriefPanel {
                         Text(stub.note)
                             .font(.subheadline)
                     }
                     Text("This screen is a placeholder in the native scaffold. It ports screen by screen from the approved design, with approval at each stage, the same process the web version followed.")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.ink.opacity(0.7))
                 }
                 .padding()
             }
-            .contentMargins(.bottom, 110)
+            .contentMargins(.bottom, 16)
         }
         .navigationTitle(stub.title)
         .navigationBarTitleDisplayMode(.inline)
@@ -86,7 +87,7 @@ struct StubBanner: View {
             .font(.footnote.weight(.medium))
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.brass.opacity(0.15), in: RoundedRectangle(cornerRadius: 14))
+            .background(Color.ink.opacity(0.06))
     }
 }
 

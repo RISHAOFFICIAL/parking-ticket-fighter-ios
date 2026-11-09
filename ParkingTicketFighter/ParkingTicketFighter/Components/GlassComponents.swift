@@ -1,62 +1,97 @@
 import SwiftUI
 
-/// Reusable components, per Apple's Human Interface Guidelines.
+/// Editorial Brief theme and components.
 ///
-/// HIG rule, verified against the Tab Bars and Sign in with Apple pages
-/// and the component pages (Buttons, Navigation, Lists, Text Fields,
-/// Materials, Typography, Color): Liquid Glass belongs only in the
-/// functional layer (the tab bar, toolbars, nav bars, sheets, alerts).
-/// A button or card sitting in content uses a standard solid style, not
-/// glass. So the tab bar is glass, and everything on a screen is solid.
-/// This also matches the app's Editorial Brief direction (no glass in
-/// content). The brand palette (forest, ivory, brass) and the solid
-/// ivory cards stay, because they are the approved brand, not glass.
+/// Chosen by Risha November 2, 2026. The app reads as a legal brief
+/// crossed with a broadsheet newspaper. Stark, serious, credible.
+/// Paper white backgrounds, ink black text and rules, one accent only:
+/// signal red, reserved for deadlines, money at risk, and urgent flags.
+/// No gradients, no glass, no blur, no shadows, no brass, no forest
+/// green. Flat matte ink on paper. Buttons are solid black rectangles
+/// with white text and square corners. Status is small caps text, not
+/// pills. Deadlines are red marginalia, not badges. The theme is
+/// locked to light (paper white always, even in device dark mode).
 enum AppTheme {
-    /// Deep forest green, the primary brand color from the approved hi-fi.
-    /// Contrast on ivory is 9.92:1, well above the 4.5:1 minimum.
-    static let forest = Color(red: 0.11, green: 0.27, blue: 0.20)
-    /// Warm ivory, the app background.
-    static let ivory = Color(red: 0.98, green: 0.96, blue: 0.92)
-    /// Brass, the accent for deadlines and money saved. Used only as a
-    /// background tint, never as text: brass on ivory is 3.17:1, below
-    /// the 4.5:1 minimum for normal text.
-    static let brass = Color(red: 0.66, green: 0.52, blue: 0.24)
-    /// Clear red, reserved for urgent deadline flags only.
-    /// Contrast on ivory is 5.19:1.
-    static let urgent = Color(red: 0.75, green: 0.20, blue: 0.16)
-    /// Clear green for strong cases and dismissed results.
-    /// Contrast on ivory is 4.87:1.
-    static let success = Color(red: 0.16, green: 0.48, blue: 0.28)
+    /// Paper white, the only background. #ffffff.
+    static let paper = Color(red: 1.0, green: 1.0, blue: 1.0)
+    /// Ink black, text and rules. #111111.
+    static let ink = Color(red: 0.067, green: 0.067, blue: 0.067)
+    /// Signal red, the one accent. #c8102e. Deadlines, money at risk,
+    /// and urgent flags only. Never used as body text.
+    static let signal = Color(red: 0.784, green: 0.063, blue: 0.180)
 }
 
 extension Color {
-    static let forest = AppTheme.forest
-    static let ivory = AppTheme.ivory
-    static let brass = AppTheme.brass
-    static let urgent = AppTheme.urgent
-    static let success = AppTheme.success
+    static let paper = AppTheme.paper
+    static let ink = AppTheme.ink
+    static let signal = AppTheme.signal
 }
 
 /// The same brand colors as ShapeStyle, so they work in
-/// `.foregroundStyle(.forest)` and other shape positions. A plain
-/// `Color` extension is not enough there: `foregroundStyle` takes a
-/// generic ShapeStyle, and the compiler only sees members defined on
-/// ShapeStyle itself. This extension makes `.forest` and the rest
-/// resolve in those positions too.
+/// `.foregroundStyle(.ink)` and other shape positions.
 extension ShapeStyle where Self == Color {
-    static var forest: Color { AppTheme.forest }
-    static var ivory: Color { AppTheme.ivory }
-    static var brass: Color { AppTheme.brass }
-    static var urgent: Color { AppTheme.urgent }
-    static var success: Color { AppTheme.success }
+    static var paper: Color { AppTheme.paper }
+    static var ink: Color { AppTheme.ink }
+    static var signal: Color { AppTheme.signal }
+}
+
+// MARK: - Typography
+
+extension Font {
+    /// Sharp serif headline (Georgia), scales with Dynamic Type.
+    static func briefHeadline(_ size: CGFloat = 28, relativeTo: TextStyle = .title2) -> Font {
+        .custom("Georgia", size: size, relativeTo: relativeTo).weight(.bold)
+    }
+    /// Serif title, for the masthead and large headlines.
+    static func briefTitle(_ size: CGFloat = 34, relativeTo: TextStyle = .largeTitle) -> Font {
+        .custom("Georgia", size: size, relativeTo: relativeTo).weight(.bold)
+    }
+}
+
+/// A small caps kicker with letterspacing, for section and screen
+/// labels, e.g. "THE BRIEF".
+struct Kicker: View {
+    let text: String
+
+    var body: some View {
+        Text(text.uppercased())
+            .font(.caption.weight(.semibold))
+            .tracking(1.5)
+            .foregroundStyle(.ink)
+    }
+}
+
+/// Status stated in small caps text, never a pill or chip,
+/// e.g. "FILED, WAITING ON RESULT".
+struct StatusCaps: View {
+    let text: String
+
+    var body: some View {
+        Text(text.uppercased())
+            .font(.caption.weight(.semibold))
+            .tracking(1.0)
+            .foregroundStyle(.ink)
+    }
+}
+
+/// A deadline as red marginalia: bold red, never a soft badge,
+/// e.g. "CONTEST BY NOV 8".
+struct DeadlineCaps: View {
+    let text: String
+
+    var body: some View {
+        Text(text.uppercased())
+            .font(.footnote.weight(.bold))
+            .tracking(0.5)
+            .foregroundStyle(.signal)
+    }
 }
 
 // MARK: - Buttons
 
-/// Primary action button, solid forest.
-/// Per HIG, a button in content uses a standard style, not glass.
-/// Used for the one main action on a screen, like "Fight a ticket".
-/// Minimum height follows the approved 44 point touch target rule.
+/// Primary action button: a solid black rectangle with white text and
+/// square corners. Used for the one main action on a screen.
+/// Minimum height follows the 44 point touch target rule.
 struct AppPrimaryButton: View {
     let title: String
     var systemImage: String? = nil
@@ -74,16 +109,17 @@ struct AppPrimaryButton: View {
             .frame(maxWidth: .infinity, minHeight: 44)
             .padding(.horizontal, 20)
             .padding(.vertical, 6)
+            .background(Color.ink)
+            .foregroundStyle(.white)
+            .cornerRadius(0)
         }
-        .buttonStyle(.borderedProminent)
-        .tint(.forest)
-        .controlSize(.large)
+        .buttonStyle(.plain)
     }
 }
 
-/// Secondary action button, standard bordered style.
-/// Pairs with AppPrimaryButton. Minimum height follows the 44 point
-/// touch target rule.
+/// Secondary action button: white with a 1px ink border and ink text,
+/// square corners. Pairs with AppPrimaryButton.
+/// Minimum height follows the 44 point touch target rule.
 struct AppSecondaryButton: View {
     let title: String
     var systemImage: String? = nil
@@ -101,9 +137,15 @@ struct AppSecondaryButton: View {
             .frame(maxWidth: .infinity, minHeight: 44)
             .padding(.horizontal, 20)
             .padding(.vertical, 6)
+            .background(Color.paper)
+            .foregroundStyle(.ink)
+            .overlay(
+                Rectangle()
+                    .strokeBorder(Color.ink, lineWidth: 1)
+            )
+            .cornerRadius(0)
         }
-        .buttonStyle(.bordered)
-        .controlSize(.large)
+        .buttonStyle(.plain)
     }
 }
 
@@ -123,62 +165,71 @@ struct AppButtonPair: View {
     }
 }
 
-// MARK: - Cards and panels
+// MARK: - Panels and rows
 
-/// A content card. Content cards stay solid ivory for legibility,
-/// per the HIG rule that glass is not used in the content layer.
-struct IvoryCard<Content: View>: View {
+/// A brief panel: paper white with a thick black top rule (6px) and
+/// square corners. Used for the major panels and the masthead.
+/// Content sits on paper, never on glass.
+struct BriefPanel<Content: View>: View {
     @ViewBuilder let content: Content
 
     var body: some View {
-        content
-            .padding(16)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.ivory, in: RoundedRectangle(cornerRadius: 20))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .strokeBorder(.forest.opacity(0.12), lineWidth: 1)
-            )
+        VStack(alignment: .leading, spacing: 0) {
+            Rectangle()
+                .fill(Color.ink)
+                .frame(height: 6)
+            content
+                .padding(16)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.paper)
+        .overlay(
+            Rectangle()
+                .strokeBorder(Color.ink.opacity(0.15), lineWidth: 1)
+        )
     }
 }
 
-/// A small solid pill used for verdicts and statuses. The label always
-/// pairs an icon with words, so color is never the only signal. The
-/// text stays dark on a light tint wash, so it meets the 4.5:1 contrast
-/// minimum even for the brass tint, which is too light to use as text.
-struct StatusBadge: View {
-    let text: String
-    let systemImage: String
-    var tint: Color = .forest
+/// A ruled row: a two column labeled row with a hairline rule below it.
+/// Used for ticket facts and filing routes, the case brief layout.
+struct RuledRow<Content: View>: View {
+    let label: String
+    @ViewBuilder let content: Content
 
     var body: some View {
-        Label(text, systemImage: systemImage)
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(tint.opacity(0.15), in: .capsule)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top) {
+                Text(label)
+                    .font(.subheadline.weight(.semibold))
+                    .frame(width: 110, alignment: .leading)
+                content
+                Spacer()
+            }
+            .padding(.vertical, 8)
+            Divider()
+                .background(Color.ink.opacity(0.2))
+        }
     }
 }
 
-extension CaseVerdict {
-    var badgeTint: Color {
-        switch self {
-        case .strong: return .success
-        case .worthFiling: return .brass
-        case .weak: return .urgent
-        }
-    }
-
-    var badgeIcon: String {
-        switch self {
-        case .strong: return "checkmark.shield.fill"
-        case .worthFiling: return "doc.text.magnifyingglass"
-        case .weak: return "exclamationmark.triangle.fill"
+/// The app masthead: a newspaper nameplate, "PARKING TICKET FIGHTER"
+/// in letterspaced serif caps, with a thick black rule below it.
+struct Masthead: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("PARKING TICKET FIGHTER")
+                .font(.briefTitle(26, relativeTo: .title2))
+                .tracking(1.0)
+                .foregroundStyle(.ink)
+            Rectangle()
+                .fill(Color.ink)
+                .frame(height: 6)
         }
     }
 }
 
 /// Money formatting used across the app: $22.50, $45.00.
+/// Tabular numerals so figures align in columns.
 enum Money {
     static func format(_ value: Double) -> String {
         value.formatted(.currency(code: "USD"))
@@ -187,18 +238,25 @@ enum Money {
 
 #Preview {
     ZStack {
-        Color.ivory.ignoresSafeArea()
+        Color.paper.ignoresSafeArea()
         VStack(spacing: 16) {
+            Masthead()
+            BriefPanel {
+                VStack(alignment: .leading, spacing: 8) {
+                    Kicker(text: "Money at risk")
+                    Text(Money.format(135))
+                        .font(.briefTitle(34, relativeTo: .largeTitle))
+                        .monospacedDigit()
+                    DeadlineCaps(text: "Contest by Nov 5, 2026")
+                    StatusCaps(text: "Filed, waiting on result")
+                }
+            }
             AppButtonPair(
                 primaryTitle: "Fight a ticket",
                 secondaryTitle: "I run vehicles for a business",
                 primaryAction: {},
                 secondaryAction: {}
             )
-            IvoryCard {
-                Text("Strong case").font(.headline)
-            }
-            StatusBadge(text: "Worth filing", systemImage: "doc.text.magnifyingglass", tint: .brass)
         }
         .padding()
     }

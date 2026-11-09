@@ -63,6 +63,34 @@ Text fields on Add Ticket:
   It is only a background tint. The StatusBadge keeps dark text on a
   light brass wash for this reason.
 
+## Editorial Brief redesign (Nov 8, 2026, Risha: "Yes, rebuild it to the Editorial Brief")
+
+Risha said the app looked worse and asked where the hi-fi was. The
+native scaffold still wore the old forest, brass, and glass look,
+which the Editorial Brief (chosen by her Nov 2, 2026) had replaced.
+The native screens were rebuilt to the Editorial Brief:
+- Paper white (#ffffff), ink black (#111111), signal red (#c8102e)
+  only for deadlines, money at risk, and urgent flags. No forest,
+  no brass, no green, no glass, no blur, no shadows.
+- Georgia serif headlines and the masthead nameplate
+  ("PARKING TICKET FIGHTER"), small caps kickers, tabular numerals
+  for money and dates.
+- Buttons are solid black rectangles with white text and square
+  corners. Status is small caps text, never pills. Deadlines are red
+  marginalia, never badges. Panels are paper white with a thick
+  black top rule and hairline dividers.
+- The tab bar is a white bar with a black top rule and black text.
+  The center camera button is a solid black square with a white
+  camera icon. The tab bar sits in the layout flow below the TabView
+  (a VStack), not overlaid, so content can never hide behind it.
+  This fixes the overlap bug Risha flagged Nov 8, where the floating
+  tab bar covered the bottom of every screen.
+- The theme is locked to light (`.preferredColorScheme(.light)`),
+  paper white always, even in device dark mode.
+- The HIG glass rule and the Editorial Brief agree: glass belongs
+  only in the functional layer, and the Brief removes glass from
+  content entirely, so the tab bar is solid white, not glass.
+
 ## Deliberate brand choices (not oversights)
 - Forest, ivory, and brass are Risha's approved brand palette, kept
   on purpose. They are custom colors, not Apple's semantic colors.

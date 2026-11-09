@@ -3,6 +3,9 @@ import SwiftUI
 /// My Tickets. Every saved ticket with its status, sorted so the most
 /// urgent contest deadline comes first, the same ordering rule the
 /// fleet dashboard (S19) uses.
+///
+/// Editorial Brief: ruled rows with hairline rules, ticket numbers in
+/// serif, deadlines in red, status in small caps. Paper white always.
 struct TicketListView: View {
     // Scaffold state: sample data stands in for saved records until
     // persistence ports from the web build in a later pass.
@@ -12,38 +15,37 @@ struct TicketListView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            ZStack {
+                Color.paper.ignoresSafeArea()
                 if tickets.isEmpty {
-                    ContentUnavailableView(
-                        "No tickets yet",
-                        systemImage: "ticket",
-                        description: Text("When one shows up, add it from the Add Ticket tab.")
-                    )
-                } else {
-                    List(tickets) { ticket in
-                        NavigationLink(value: ticket) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack {
-                                    Text(ticket.number).font(.headline)
-                                    Spacer()
-                                    Text(ticket.status.rawValue)
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(.secondary)
-                                }
-                                Text("Zone \(ticket.zone), \(ticket.location)")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                Text("Contest by \(ticket.contestDeadline.formatted(date: .abbreviated, time: .omitted))")
-                                    .font(.footnote)
+                    VStack {
+                        BriefPanel {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("No tickets yet.")
+                                    .font(.briefHeadline(20, relativeTo: .title3))
+                                Text("When one shows up, add it from the Add Ticket tab.")
+                                    .foregroundStyle(.ink.opacity(0.7))
                             }
-                            .padding(.vertical, 4)
                         }
                     }
-                    .listStyle(.insetGrouped)
-                    .contentMargins(.bottom, 110)
+                    .padding()
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(tickets) { ticket in
+                                NavigationLink(value: ticket) {
+                                    TicketRow(ticket: ticket)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .contentMargins(.bottom, 16)
                 }
             }
             .navigationTitle("My Tickets")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: Ticket.self) { ticket in
                 TicketDetailView(ticket: ticket)
             }

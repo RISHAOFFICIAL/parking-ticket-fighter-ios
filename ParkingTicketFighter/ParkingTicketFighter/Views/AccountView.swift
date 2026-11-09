@@ -11,6 +11,8 @@ import SwiftUI
 /// in. Apple only shares the name and email on the first sign-in, so they
 /// are stored the first time they arrive. A private relay email is shown
 /// as it arrives and is never swapped for a personal email.
+///
+/// Editorial Brief: paper white, black square buttons, small caps status.
 struct AccountView: View {
     @AppStorage("appleUserID") private var userID: String?
     @AppStorage("appleUserName") private var displayName: String?
@@ -21,7 +23,7 @@ struct AccountView: View {
 
     var body: some View {
         ZStack {
-            Color.ivory.opacity(0.55).ignoresSafeArea()
+            Color.paper.ignoresSafeArea()
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     if isSignedIn {
@@ -32,12 +34,12 @@ struct AccountView: View {
                     if let signInError {
                         Text(signInError)
                             .font(.footnote)
-                            .foregroundStyle(.urgent)
+                            .foregroundStyle(.signal)
                     }
                 }
                 .padding()
             }
-            .contentMargins(.bottom, 110)
+            .contentMargins(.bottom, 16)
         }
         .navigationTitle("Account")
         .navigationBarTitleDisplayMode(.inline)
@@ -45,13 +47,12 @@ struct AccountView: View {
     }
 
     private var signInCard: some View {
-        IvoryCard {
+        BriefPanel {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Sign in to keep your tickets")
-                    .font(.headline)
+                Kicker(text: "Sign in to keep your tickets")
                 Text("Sign in with Apple to save your tickets and packets to your account, so they are there on any device you use. Nothing is saved to an account until you sign in.")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.ink.opacity(0.7))
                 SignInWithAppleButton(.signIn) { request in
                     request.requestedScopes = [.fullName, .email]
                 } onCompletion: { result in
@@ -64,22 +65,21 @@ struct AccountView: View {
     }
 
     private var signedInCard: some View {
-        IvoryCard {
+        BriefPanel {
             VStack(alignment: .leading, spacing: 12) {
-                Label("Using Sign in with Apple", systemImage: "apple.logo")
-                    .font(.headline)
+                Kicker(text: "Using Sign in with Apple")
                 if let displayName, !displayName.isEmpty {
                     Text(displayName)
-                        .font(.subheadline)
+                        .font(.briefHeadline(20, relativeTo: .title3))
                 }
                 if let email, !email.isEmpty {
                     Text(email)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.ink.opacity(0.7))
                 }
                 Text("Your tickets and packets save to this account.")
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.ink.opacity(0.7))
                 AppSecondaryButton(title: "Sign out", systemImage: "rectangle.portrait.and.arrow.right") {
                     signOut()
                 }
