@@ -32,7 +32,7 @@ struct HomeView: View {
                 }
                 .contentMargins(.bottom, 110)
             }
-            .navigationTitle("Parking Ticket Fighter")
+            .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -60,14 +60,14 @@ struct HomeView: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            GlassPrimaryButton(title: "Add a ticket", systemImage: "plus") {}
+            AppPrimaryButton(title: "Add a ticket", systemImage: "plus") {}
         }
     }
 
-    /// Money at risk and the nearest deadline, on a glass panel because
-    /// this is one of the key summary moments in the approved design.
+    /// Money at risk and the nearest deadline, on a solid ivory card.
+    /// Per HIG, glass is for the functional layer only, not content.
     private var summaryPanel: some View {
-        GlassPanel(tint: .brass) {
+        IvoryCard {
             VStack(alignment: .leading, spacing: 8) {
                 Label("Money at risk", systemImage: "exclamationmark.circle.fill")
                     .font(.subheadline.weight(.semibold))
@@ -113,7 +113,7 @@ struct TicketRow: View {
                     Text(ticket.number)
                         .font(.headline)
                     Spacer()
-                    GlassBadge(
+                    StatusBadge(
                         text: ticket.verdict.rawValue,
                         systemImage: ticket.verdict.badgeIcon,
                         tint: ticket.verdict.badgeTint

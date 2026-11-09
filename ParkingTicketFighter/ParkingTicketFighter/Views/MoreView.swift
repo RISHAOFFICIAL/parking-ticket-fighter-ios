@@ -120,7 +120,7 @@ struct FilingInstructionsStub: View {
             }
             .contentMargins(.bottom, 110)
         }
-        .navigationTitle("Filing instructions")
+        .navigationTitle("Filing")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -1,24 +1,31 @@
 import SwiftUI
 
-/// Reusable Liquid Glass components, per Risha's standing Apple design
-/// rule (October 13, 2026): Apple platform apps use the glass effect
-/// for buttons and other UI elements, using the iOS 26 glass APIs.
+/// Reusable components, per Apple's Human Interface Guidelines.
 ///
-/// Per Apple Materials guidance carried in the approved hi-fi spec:
-/// glass belongs on the functional layer (buttons, tab bar, toolbars,
-/// floating actions, key verdict and pay panels), used sparingly.
-/// Content stays on solid ivory cards so text stays legible. Critical
-/// text never sits on unmodified glass without a legibility layer.
+/// HIG rule, verified against the Tab Bars and Sign in with Apple pages
+/// and the component pages (Buttons, Navigation, Lists, Text Fields,
+/// Materials, Typography, Color): Liquid Glass belongs only in the
+/// functional layer (the tab bar, toolbars, nav bars, sheets, alerts).
+/// A button or card sitting in content uses a standard solid style, not
+/// glass. So the tab bar is glass, and everything on a screen is solid.
+/// This also matches the app's Editorial Brief direction (no glass in
+/// content). The brand palette (forest, ivory, brass) and the solid
+/// ivory cards stay, because they are the approved brand, not glass.
 enum AppTheme {
     /// Deep forest green, the primary brand color from the approved hi-fi.
+    /// Contrast on ivory is 9.92:1, well above the 4.5:1 minimum.
     static let forest = Color(red: 0.11, green: 0.27, blue: 0.20)
     /// Warm ivory, the app background.
     static let ivory = Color(red: 0.98, green: 0.96, blue: 0.92)
-    /// Brass, the accent for deadlines and money saved.
+    /// Brass, the accent for deadlines and money saved. Used only as a
+    /// background tint, never as text: brass on ivory is 3.17:1, below
+    /// the 4.5:1 minimum for normal text.
     static let brass = Color(red: 0.66, green: 0.52, blue: 0.24)
     /// Clear red, reserved for urgent deadline flags only.
+    /// Contrast on ivory is 5.19:1.
     static let urgent = Color(red: 0.75, green: 0.20, blue: 0.16)
     /// Clear green for strong cases and dismissed results.
+    /// Contrast on ivory is 4.87:1.
     static let success = Color(red: 0.16, green: 0.48, blue: 0.28)
 }
 
@@ -46,10 +53,11 @@ extension ShapeStyle where Self == Color {
 
 // MARK: - Buttons
 
-/// Primary action button in Liquid Glass, tinted forest.
+/// Primary action button, solid forest.
+/// Per HIG, a button in content uses a standard style, not glass.
 /// Used for the one main action on a screen, like "Fight a ticket".
 /// Minimum height follows the approved 44 point touch target rule.
-struct GlassPrimaryButton: View {
+struct AppPrimaryButton: View {
     let title: String
     var systemImage: String? = nil
     let action: () -> Void
@@ -67,16 +75,16 @@ struct GlassPrimaryButton: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 6)
         }
-        .buttonStyle(.glassProminent)
+        .buttonStyle(.borderedProminent)
         .tint(.forest)
         .controlSize(.large)
     }
 }
 
-/// Secondary action button in plain Liquid Glass, no tint.
-/// Pairs with GlassPrimaryButton inside a GlassEffectContainer so the
-/// two surfaces blend correctly where they sit close together.
-struct GlassSecondaryButton: View {
+/// Secondary action button, standard bordered style.
+/// Pairs with AppPrimaryButton. Minimum height follows the 44 point
+/// touch target rule.
+struct AppSecondaryButton: View {
     let title: String
     var systemImage: String? = nil
     let action: () -> Void
@@ -94,25 +102,23 @@ struct GlassSecondaryButton: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 6)
         }
-        .buttonStyle(.glass)
+        .buttonStyle(.bordered)
         .controlSize(.large)
     }
 }
 
 /// The two button pair used on Welcome (S1) and the pay panel (S11):
-/// one primary action, one secondary, grouped in a glass container.
-struct GlassButtonPair: View {
+/// one primary action, one secondary.
+struct AppButtonPair: View {
     let primaryTitle: String
     let secondaryTitle: String
     let primaryAction: () -> Void
     let secondaryAction: () -> Void
 
     var body: some View {
-        GlassEffectContainer(spacing: 12) {
-            VStack(spacing: 12) {
-                GlassPrimaryButton(title: primaryTitle, action: primaryAction)
-                GlassSecondaryButton(title: secondaryTitle, action: secondaryAction)
-            }
+        VStack(spacing: 12) {
+            AppPrimaryButton(title: primaryTitle, action: primaryAction)
+            AppSecondaryButton(title: secondaryTitle, action: secondaryAction)
         }
     }
 }
@@ -120,7 +126,7 @@ struct GlassButtonPair: View {
 // MARK: - Cards and panels
 
 /// A content card. Content cards stay solid ivory for legibility,
-/// per the hi-fi rule that glass is not smeared over all content.
+/// per the HIG rule that glass is not used in the content layer.
 struct IvoryCard<Content: View>: View {
     @ViewBuilder let content: Content
 
@@ -136,27 +142,11 @@ struct IvoryCard<Content: View>: View {
     }
 }
 
-/// A glass panel for the key moments the hi-fi reserves glass for:
-/// the verdict on the case check (S6) and the pay panel (S11).
-/// Text sits on the tinted glass with a strong tint so it stays legible.
-struct GlassPanel<Content: View>: View {
-    var tint: Color = .forest
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        content
-            .padding(16)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .glassEffect(
-                .regular.tint(tint.opacity(0.22)).interactive(false),
-                in: RoundedRectangle(cornerRadius: 24)
-            )
-    }
-}
-
-/// A small glass pill used for verdicts and statuses. The label always
-/// pairs an icon with words, so color is never the only signal.
-struct GlassBadge: View {
+/// A small solid pill used for verdicts and statuses. The label always
+/// pairs an icon with words, so color is never the only signal. The
+/// text stays dark on a light tint wash, so it meets the 4.5:1 contrast
+/// minimum even for the brass tint, which is too light to use as text.
+struct StatusBadge: View {
     let text: String
     let systemImage: String
     var tint: Color = .forest
@@ -166,7 +156,7 @@ struct GlassBadge: View {
             .font(.caption.weight(.semibold))
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
-            .glassEffect(.regular.tint(tint.opacity(0.25)), in: .capsule)
+            .background(tint.opacity(0.15), in: .capsule)
     }
 }
 
@@ -199,16 +189,16 @@ enum Money {
     ZStack {
         Color.ivory.ignoresSafeArea()
         VStack(spacing: 16) {
-            GlassButtonPair(
+            AppButtonPair(
                 primaryTitle: "Fight a ticket",
                 secondaryTitle: "I run vehicles for a business",
                 primaryAction: {},
                 secondaryAction: {}
             )
-            GlassPanel(tint: .forest) {
+            IvoryCard {
                 Text("Strong case").font(.headline)
             }
-            GlassBadge(text: "Worth filing", systemImage: "doc.text.magnifyingglass", tint: .brass)
+            StatusBadge(text: "Worth filing", systemImage: "doc.text.magnifyingglass", tint: .brass)
         }
         .padding()
     }

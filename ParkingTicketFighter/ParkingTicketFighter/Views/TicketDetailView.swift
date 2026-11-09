@@ -27,11 +27,12 @@ struct TicketDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    /// The case check verdict (S6), on glass, with the reason in words.
+    /// The case check verdict (S6), on a solid ivory card, with the
+    /// reason in words. Per HIG, glass is for the functional layer only.
     private var verdictPanel: some View {
-        GlassPanel(tint: ticket.verdict.badgeTint) {
+        IvoryCard {
             VStack(alignment: .leading, spacing: 8) {
-                GlassBadge(
+                StatusBadge(
                     text: ticket.verdict.rawValue,
                     systemImage: ticket.verdict.badgeIcon,
                     tint: ticket.verdict.badgeTint

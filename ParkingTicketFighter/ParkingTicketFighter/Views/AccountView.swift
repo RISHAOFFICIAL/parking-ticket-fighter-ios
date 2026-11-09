@@ -80,7 +80,7 @@ struct AccountView: View {
                 Text("Your tickets and packets save to this account.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                GlassSecondaryButton(title: "Sign out", systemImage: "rectangle.portrait.and.arrow.right") {
+                AppSecondaryButton(title: "Sign out", systemImage: "rectangle.portrait.and.arrow.right") {
                     signOut()
                 }
             }

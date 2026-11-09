@@ -30,7 +30,7 @@ enum StubCatalog {
         ScreenStub(screenID: "S8", title: "Your statement", note: "The editable statement. The draft text already generates from ticket facts in the model; this screen adds editing."),
         ScreenStub(screenID: "S9", title: "Packet preview", note: "Cover summary, statement, ticket photo, evidence pages, deadlines page, in one printable packet."),
         ScreenStub(screenID: "S10", title: "Defense checker", note: "Broken meter, hidden sign, loading, emergency, wrong plate. Each yes attaches evidence and updates the case check."),
-        ScreenStub(screenID: "S11", title: "Pay $19", note: "Shown only at packet completion. Real payment needs a processor connected with approval. Until then, no card is charged or stored."),
+        ScreenStub(screenID: "S11", title: "Pay", note: "Shown only at packet completion. The packet is free during launch; the plan after launch is $15 per packet, first ticket free. Real payment needs a processor connected with approval. Until then, no card is charged or stored."),
         ScreenStub(screenID: "S13", title: "Mark as filed", note: "Pick the date and method filed. Moves the ticket to Filed, waiting on result."),
         ScreenStub(screenID: "S15", title: "Result check in", note: "At day 30: Dismissed (shows money saved), Upheld (shows what is owed and by when), or Not yet (snoozes two weeks)."),
         ScreenStub(screenID: "S16", title: "Duplicate review", note: "Suspected duplicate parking charges side by side, with a dispute summary to take to the bank. The app never contacts the bank."),
@@ -51,7 +51,7 @@ struct StubScreenView: View {
             Color.ivory.opacity(0.55).ignoresSafeArea()
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    GlassPanel(tint: .brass) {
+                    IvoryCard {
                         VStack(alignment: .leading, spacing: 6) {
                             Label("Stub screen", systemImage: "hammer.fill")
                                 .font(.headline)
@@ -86,7 +86,7 @@ struct StubBanner: View {
             .font(.footnote.weight(.medium))
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .glassEffect(.regular.tint(.brass.opacity(0.25)), in: RoundedRectangle(cornerRadius: 14))
+            .background(Color.brass.opacity(0.15), in: RoundedRectangle(cornerRadius: 14))
     }
 }
 

@@ -22,8 +22,8 @@ struct AddTicketView: View {
         NavigationStack {
             Form {
                 Section {
-                    GlassSecondaryButton(title: "Take a photo of the ticket", systemImage: "camera.fill") {}
-                    GlassSecondaryButton(title: "Upload a photo", systemImage: "photo.on.rectangle") {}
+                    AppSecondaryButton(title: "Take a photo of the ticket", systemImage: "camera.fill") {}
+                    AppSecondaryButton(title: "Upload a photo", systemImage: "photo.on.rectangle") {}
                     Text("The photo stays attached as evidence either way. If the app cannot read it clearly, you can type the details instead. Photo reading arrives in a later pass and will only be switched on once it is verified.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -33,11 +33,19 @@ struct AddTicketView: View {
 
                 Section {
                     TextField("Ticket number", text: $number)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.characters)
                     DatePicker("Date and time issued", selection: $issueDate)
                     TextField("Zone", text: $zone)
+                        .keyboardType(.numberPad)
+                        .autocorrectionDisabled()
                     TextField("Location", text: $location)
                     TextField("Plate", text: $plate)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.characters)
                     TextField("Code", text: $code)
+                        .keyboardType(.numberPad)
+                        .autocorrectionDisabled()
                 } header: {
                     Text("Or type the details")
                 } footer: {
@@ -59,7 +67,7 @@ struct AddTicketView: View {
                 }
 
                 Section {
-                    GlassPrimaryButton(title: "Check my case", systemImage: "checkmark.shield.fill") {}
+                    AppPrimaryButton(title: "Check my case", systemImage: "checkmark.shield.fill") {}
                     Text("Saving and the case check arrive in the next update. Nothing is saved from this screen yet.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
