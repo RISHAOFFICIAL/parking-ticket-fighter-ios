@@ -214,12 +214,12 @@ struct RuledRow<Content: View>: View {
     }
 }
 
-/// The app masthead: a newspaper nameplate, "PARKING TICKET FIGHTER"
+/// The app masthead: a newspaper nameplate, "BEAT THE METER"
 /// in letterspaced serif caps, with a thick black rule below it.
 struct Masthead: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("PARKING TICKET FIGHTER")
+            Text("BEAT THE METER")
                 .font(.briefTitle(26, relativeTo: .title2))
                 .tracking(1.0)
                 .foregroundStyle(.ink)
