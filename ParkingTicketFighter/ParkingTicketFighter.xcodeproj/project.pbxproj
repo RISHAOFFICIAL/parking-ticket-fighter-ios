@@ -19,6 +19,7 @@
 		70000000000000000000000A /* AddTicketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000000A /* AddTicketView.swift */; };
 		70000000000000000000000B /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000000B /* MoreView.swift */; };
 		70000000000000000000000C /* StubScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000000C /* StubScreens.swift */; };
+		70000000000000000000000E /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000000E /* AccountView.swift */; };
 		70000000000000000000000D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000000D /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,8 @@
 		60000000000000000000000A /* AddTicketView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddTicketView.swift; sourceTree = "<group>"; };
 		60000000000000000000000B /* MoreView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
 		60000000000000000000000C /* StubScreens.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StubScreens.swift; sourceTree = "<group>"; };
+		60000000000000000000000E /* AccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
+		60000000000000000000000F /* ParkingTicketFighter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ParkingTicketFighter.entitlements; sourceTree = "<group>"; };
 		60000000000000000000000D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,6 +78,7 @@
 				100000000000000000000006 /* Views */,
 				100000000000000000000007 /* Components */,
 				60000000000000000000000D /* Assets.xcassets */,
+				60000000000000000000000F /* ParkingTicketFighter.entitlements */,
 			);
 			path = ParkingTicketFighter;
 			sourceTree = "<group>";
@@ -98,6 +102,7 @@
 				60000000000000000000000A /* AddTicketView.swift */,
 				60000000000000000000000B /* MoreView.swift */,
 				60000000000000000000000C /* StubScreens.swift */,
+				60000000000000000000000E /* AccountView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -191,6 +196,7 @@
 				70000000000000000000000A /* AddTicketView.swift in Sources */,
 				70000000000000000000000B /* MoreView.swift in Sources */,
 				70000000000000000000000C /* StubScreens.swift in Sources */,
+				70000000000000000000000E /* AccountView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
