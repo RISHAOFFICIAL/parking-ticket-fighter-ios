@@ -7,6 +7,14 @@ struct MoreView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section("Account") {
+                    NavigationLink {
+                        AccountView()
+                    } label: {
+                        Label("Account", systemImage: "apple.logo")
+                    }
+                }
+
                 Section("Detroit filing routes") {
                     ForEach(DetroitFacts.filingRoutes, id: \.title) { route in
                         VStack(alignment: .leading, spacing: 2) {
