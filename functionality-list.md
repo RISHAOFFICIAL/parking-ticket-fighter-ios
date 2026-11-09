@@ -1,4 +1,5 @@
-# Parking Ticket Fighter, functionality list
+# Beat the Meter, functionality list
+Renamed Nov 9, 2026: the app is now called Beat the Meter (was Parking Ticket Fighter).
 
 What the app should do, from the approved design: Stage 2 user stories (20),
 Stage 3 flow (S1 to S21), Stage 6 build spec. Written Nov 8, 2026, after Risha
