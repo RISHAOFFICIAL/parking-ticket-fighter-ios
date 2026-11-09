@@ -30,6 +30,20 @@ extension Color {
     static let success = AppTheme.success
 }
 
+/// The same brand colors as ShapeStyle, so they work in
+/// `.foregroundStyle(.forest)` and other shape positions. A plain
+/// `Color` extension is not enough there: `foregroundStyle` takes a
+/// generic ShapeStyle, and the compiler only sees members defined on
+/// ShapeStyle itself. This extension makes `.forest` and the rest
+/// resolve in those positions too.
+extension ShapeStyle where Self == Color {
+    static var forest: Color { AppTheme.forest }
+    static var ivory: Color { AppTheme.ivory }
+    static var brass: Color { AppTheme.brass }
+    static var urgent: Color { AppTheme.urgent }
+    static var success: Color { AppTheme.success }
+}
+
 // MARK: - Buttons
 
 /// Primary action button in Liquid Glass, tinted forest.
