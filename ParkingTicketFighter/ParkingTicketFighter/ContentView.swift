@@ -13,11 +13,11 @@ import SwiftUI
 /// The camera itself lives on the Add Ticket screen, where the user picks
 /// Take a photo, Upload a photo, or Type the ticket number instead.
 struct ContentView: View {
-    enum Tab: Hashable {
+    enum AppTab: Hashable {
         case home, tickets, add, more
     }
 
-    @State private var selectedTab: Tab = .home
+    @State private var selectedTab: AppTab = .home
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -96,7 +96,7 @@ struct ContentView: View {
         .accessibilityLabel("Add Ticket")
     }
 
-    private func tabButton(_ tab: Tab, title: String, systemImage: String) -> some View {
+    private func tabButton(_ tab: AppTab, title: String, systemImage: String) -> some View {
         Button {
             selectedTab = tab
         } label: {
