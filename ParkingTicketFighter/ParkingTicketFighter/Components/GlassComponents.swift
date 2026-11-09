@@ -91,7 +91,8 @@ struct DeadlineCaps: View {
 
 /// Primary action button: a solid black rectangle with white text and
 /// square corners. Used for the one main action on a screen.
-/// Minimum height follows the 44 point touch target rule.
+/// Minimum height follows the 44 point touch target rule. The label
+/// centers and wraps cleanly if the title needs two lines.
 struct AppPrimaryButton: View {
     let title: String
     var systemImage: String? = nil
@@ -105,13 +106,13 @@ struct AppPrimaryButton: View {
                 }
                 Text(title)
                     .fontWeight(.semibold)
+                    .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity, minHeight: 44)
             .padding(.horizontal, 20)
-            .padding(.vertical, 6)
+            .padding(.vertical, 10)
             .background(Color.ink)
             .foregroundStyle(.white)
-            .cornerRadius(0)
         }
         .buttonStyle(.plain)
     }
@@ -119,7 +120,8 @@ struct AppPrimaryButton: View {
 
 /// Secondary action button: white with a 1px ink border and ink text,
 /// square corners. Pairs with AppPrimaryButton.
-/// Minimum height follows the 44 point touch target rule.
+/// Minimum height follows the 44 point touch target rule. The label
+/// centers and wraps cleanly if the title needs two lines.
 struct AppSecondaryButton: View {
     let title: String
     var systemImage: String? = nil
@@ -133,17 +135,14 @@ struct AppSecondaryButton: View {
                 }
                 Text(title)
                     .fontWeight(.medium)
+                    .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity, minHeight: 44)
             .padding(.horizontal, 20)
-            .padding(.vertical, 6)
+            .padding(.vertical, 10)
             .background(Color.paper)
             .foregroundStyle(.ink)
-            .overlay(
-                Rectangle()
-                    .strokeBorder(Color.ink, lineWidth: 1)
-            )
-            .cornerRadius(0)
+            .border(Color.ink, width: 1)
         }
         .buttonStyle(.plain)
     }
@@ -192,6 +191,7 @@ struct BriefPanel<Content: View>: View {
 
 /// A ruled row: a two column labeled row with a hairline rule below it.
 /// Used for ticket facts and filing routes, the case brief layout.
+/// The label and the content are ink black, so the text stays readable.
 struct RuledRow<Content: View>: View {
     let label: String
     @ViewBuilder let content: Content
@@ -201,8 +201,10 @@ struct RuledRow<Content: View>: View {
             HStack(alignment: .top) {
                 Text(label)
                     .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.ink)
                     .frame(width: 110, alignment: .leading)
                 content
+                    .foregroundStyle(.ink)
                 Spacer()
             }
             .padding(.vertical, 8)

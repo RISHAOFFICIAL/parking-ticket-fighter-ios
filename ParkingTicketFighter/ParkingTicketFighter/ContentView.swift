@@ -6,11 +6,16 @@ import SwiftUI
 /// Editorial Brief (chosen by Risha Nov 2, 2026): paper white, ink
 /// black, signal red only for deadlines and money at risk. The tab bar
 /// is a white bar with a black top rule and black text. The center
-/// camera button is a solid black square with a white camera icon, so
-/// it fits the brief. The tab bar sits in the layout flow below the
-/// TabView (a VStack), not overlaid on top of it, so content can never
-/// hide behind it. The theme is locked to light, paper white always,
-/// even in device dark mode.
+/// camera button is a solid black square with a white camera icon.
+///
+/// The tabs are switched manually (a ZStack with one visible tab),
+/// not with a TabView. A TabView renders its own floating pill tab bar
+/// in iOS 26, and hiding it left a white pill covering content. The
+/// manual switch keeps each tab's NavigationStack alive, so navigation
+/// state is preserved, and the custom tab bar sits in the layout flow
+/// below the content (a VStack), so content can never hide behind it.
+/// The theme is locked to light, paper white always, even in device
+/// dark mode.
 struct ContentView: View {
     enum AppTab: Hashable {
         case home, tickets, add, more
@@ -20,21 +25,21 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            TabView(selection: $selectedTab) {
-                Tab(value: .home) {
-                    HomeView()
-                }
-                Tab(value: .tickets) {
-                    TicketListView()
-                }
-                Tab(value: .add) {
-                    AddTicketView()
-                }
-                Tab(value: .more) {
-                    MoreView()
-                }
+            ZStack {
+                HomeView()
+                    .opacity(selectedTab == .home ? 1 : 0)
+                    .disabled(selectedTab != .home)
+                TicketListView()
+                    .opacity(selectedTab == .tickets ? 1 : 0)
+                    .disabled(selectedTab != .tickets)
+                AddTicketView()
+                    .opacity(selectedTab == .add ? 1 : 0)
+                    .disabled(selectedTab != .add)
+                MoreView()
+                    .opacity(selectedTab == .more ? 1 : 0)
+                    .disabled(selectedTab != .more)
             }
-            .toolbar(.hidden, for: .tabBar)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             customTabBar
         }

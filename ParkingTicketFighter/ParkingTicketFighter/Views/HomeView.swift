@@ -121,7 +121,7 @@ struct TicketRow: View {
                 Text("Zone \(ticket.zone), \(ticket.location). Issued \(ticket.issueDate.formatted(date: .abbreviated, time: .shortened)).")
                     .font(.subheadline)
                     .foregroundStyle(.ink.opacity(0.7))
-                HStack(spacing: 6) {
+                VStack(alignment: .leading, spacing: 2) {
                     DeadlineCaps(text: "Contest by \(ticket.contestDeadline.formatted(date: .abbreviated, time: .omitted))")
                     Text("or the fine steps up to \(Money.format(ticket.fineLater)).")
                         .font(.footnote.weight(.medium))
