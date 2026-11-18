@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// Root tab structure, mirroring the approved flow's top level navigation:
 /// Home, My Tickets, Add Ticket, More (resources).
@@ -21,6 +22,7 @@ struct ContentView: View {
         case home, tickets, add, more
     }
 
+    @Environment(\.modelContext) private var modelContext
     @State private var selectedTab: AppTab = .home
 
     var body: some View {
@@ -45,6 +47,23 @@ struct ContentView: View {
         }
         .tint(.ink)
         .preferredColorScheme(.light)
+        .task {
+            seedSampleTicketsIfNeeded()
+        }
+    }
+
+    /// First launch only: seed the store with the three real example
+    /// tickets from the project record, so the app shows real data
+    /// while it is being tested. Runs once; if the store already has
+    /// any tickets, it does nothing. Remove this before App Store
+    /// release: a real user must never see someone else's tickets.
+    private func seedSampleTicketsIfNeeded() {
+        let descriptor = FetchDescriptor<Ticket>()
+        guard let existing = try? modelContext.fetch(descriptor), existing.isEmpty else { return }
+        for ticket in SampleData.tickets {
+            modelContext.insert(ticket)
+        }
+        try? modelContext.save()
     }
 
     /// The bottom bar. A white bar with a black top rule and black text,
@@ -118,4 +137,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .modelContainer(for: Ticket.self, inMemory: true)
 }

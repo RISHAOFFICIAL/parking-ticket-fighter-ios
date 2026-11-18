@@ -186,3 +186,22 @@ registered in the City's Detroit Discount program.
   and session matching, statement editing, packet building, pay, mark as
   filed and result check-in, duplicate review, fleet, and local
   notifications.
+
+## Saving wired (Nov 17, 2026)
+
+- Ticket is now a SwiftData `@Model` class. The app creates the store
+  with `.modelContainer(for: Ticket.self)` in ParkingTicketFighterApp.
+- Add Ticket saves: the form builds a Ticket, inserts it, and shows the
+  first-pass verdict (paid means Strong, tried to pay means Worth
+  filing, did not pay means Weak). Ticket number, zone, and plate are
+  required. The form clears after a save.
+- Home and My Tickets read from the store with `@Query`, so saved
+  tickets show up right away and totals reflect what is actually saved.
+- Ticket detail has a delete button with a confirmation dialog.
+- First launch seeds the three sample tickets from the project record.
+  Remove the seed before App Store release: a real user must never
+  see someone else's tickets.
+- Still to build: photo capture and OCR, evidence upload and session
+  matching, the full S6 case check, statement editing, packet building,
+  pay, mark as filed and result check-in, duplicate review, fleet, and
+  local notifications.

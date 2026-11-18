@@ -1,15 +1,22 @@
 import SwiftUI
+import SwiftData
 
 /// Ticket detail. Mirrors the tracking screen (S14): the facts, both
 /// deadlines up front, the status timeline, the drafted statement (S8),
-/// and the evidence checklist (S7). Read only in this scaffold: editing,
-/// packet building, and the pay gate port in later passes.
+/// and the evidence checklist (S7). Delete is wired: the button at
+/// the bottom removes the ticket from the store after a confirmation.
+/// Editing, packet building, and the pay gate port in later passes.
 ///
 /// Editorial Brief: the detail reads as a case brief. Labeled fields
 /// in ruled two column rows, deadlines as red marginalia, status in
 /// small caps text. Paper white always.
 struct TicketDetailView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+
     let ticket: Ticket
+
+    @State private var showingDeleteConfirmation = false
 
     var body: some View {
         ZStack {
@@ -22,6 +29,7 @@ struct TicketDetailView: View {
                     statementCard
                     evidenceCard
                     filingCard
+                    deleteSection
                 }
                 .padding()
             }
@@ -29,6 +37,32 @@ struct TicketDetailView: View {
         }
         .navigationTitle(ticket.number)
         .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog(
+            "Delete ticket \(ticket.number)?",
+            isPresented: $showingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete ticket", role: .destructive) {
+                modelContext.delete(ticket)
+                try? modelContext.save()
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This removes the ticket and its deadlines. It cannot be undone.")
+        }
+    }
+
+    /// Delete sits at the bottom, away from the case content, in
+    /// signal red so it reads as destructive at a glance.
+    private var deleteSection: some View {
+        Button {
+            showingDeleteConfirmation = true
+        } label: {
+            Text("Delete this ticket")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.signal)
+        }
     }
 
     /// The case check verdict (S6), on a brief panel with a thick top
@@ -183,4 +217,5 @@ struct TicketDetailView: View {
     NavigationStack {
         TicketDetailView(ticket: SampleData.appFailureTicket)
     }
+    .modelContainer(for: Ticket.self, inMemory: true)
 }

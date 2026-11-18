@@ -1,20 +1,26 @@
 import SwiftUI
+import SwiftData
 
 /// Home. The front page. Mirrors the approved flow's Home states:
 /// open tickets with money at risk up top, the lifetime money saved,
 /// and the friendly empty state when there are no tickets yet.
+/// Tickets come from the SwiftData store (`@Query`), so the totals
+/// always reflect what is actually saved.
 ///
 /// Editorial Brief: the masthead is the newspaper nameplate at the
 /// top, headlines are declarative serif, money and deadlines use
 /// tabular numerals, deadlines are red marginalia, status is small
 /// caps text. Paper white always. No glass, no rounded cards.
 struct HomeView: View {
-    // Scaffold state: sample data stands in for saved records until
-    // persistence ports from the web build in a later pass.
-    private let tickets = SampleData.tickets
+    @Query private var tickets: [Ticket]
 
     private var openTickets: [Ticket] {
         tickets.filter { $0.status.isOpen }
+    }
+
+    /// Money still at risk across the open tickets.
+    private var totalAtRisk: Double {
+        openTickets.reduce(0) { $0 + $1.amountAtRisk }
     }
 
     var body: some View {
@@ -73,7 +79,7 @@ struct HomeView: View {
         BriefPanel {
             VStack(alignment: .leading, spacing: 8) {
                 Kicker(text: "Money at risk")
-                Text(Money.format(SampleData.totalAtRisk))
+                Text(Money.format(totalAtRisk))
                     .font(.briefTitle(40, relativeTo: .largeTitle))
                     .monospacedDigit()
                 if let next = openTickets.min(by: { $0.contestDeadline < $1.contestDeadline }) {
@@ -136,4 +142,5 @@ struct TicketRow: View {
 
 #Preview {
     HomeView()
+        .modelContainer(for: Ticket.self, inMemory: true)
 }

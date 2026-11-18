@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 /// The answer to the one question on screen S5 of the approved flow:
 /// "When this ticket was written, had you paid for parking?"
@@ -46,8 +47,18 @@ enum FilingMethod: String, Codable, CaseIterable {
 
 /// One parking ticket. Field set matches the minimum data model in the
 /// Stage 6 build spec (06-build/build-spec.md).
-struct Ticket: Identifiable, Codable, Hashable {
-    var id: UUID
+///
+/// This is a SwiftData model (`@Model`), so tickets are saved on the
+/// device and survive app relaunches. The enums above are `String,
+/// Codable`, so SwiftData stores them as their raw values. Computed
+/// properties (deadlines, statement draft) are not stored; they are
+/// recalculated from the stored fields every time they are read.
+/// `@Model` provides Identifiable and Hashable, so `Ticket` still
+/// works with `ForEach`, `NavigationLink(value:)`, and
+/// `navigationDestination(for:)` exactly as the struct did.
+@Model
+final class Ticket {
+    var id: UUID = UUID()
     var number: String
     var issueDate: Date
     var zone: String

@@ -1,19 +1,23 @@
 import SwiftUI
+import SwiftData
 
 /// Add Ticket. The entry point of the core fight flow (S3, S4, S5).
 ///
-/// SCAFFOLD NOTE: this screen has the approved shape, but it does not
-/// save yet. In the approved flow, S3 offers "Take a photo of the
-/// ticket", "Upload a photo", and "Type the ticket number instead".
-/// Photo reading (OCR) is not claimed anywhere until it is verified
-/// working with a real ticket photo, the same honest limit the web
-/// build carries. Manual entry below mirrors S4 (confirm details)
-/// and S5 (the one question).
+/// Saving is wired: "Check my case" builds a Ticket from the form,
+/// inserts it into the SwiftData store, and shows the case check
+/// verdict. The verdict here is the first-pass rule from the approved
+/// flow: paid means Strong, tried to pay means Worth filing, did not
+/// pay means Weak. The full S6 case check, which weighs the evidence,
+/// arrives in a later pass. Photo reading (OCR) is not claimed
+/// anywhere until it is verified working with a real ticket photo,
+/// the same honest limit the web build carries.
 ///
 /// Editorial Brief: paper white, ruled rows, black square buttons.
 /// Every field carries a persistent label above it, never a
 /// placeholder alone.
 struct AddTicketView: View {
+    @Environment(\.modelContext) private var modelContext
+
     @State private var number = ""
     @State private var zone = ""
     @State private var location = ""
@@ -21,6 +25,26 @@ struct AddTicketView: View {
     @State private var code = "821"
     @State private var issueDate = Date()
     @State private var paidAnswer: PaidAnswer = .paid
+    @State private var savedTicketNumber: String?
+    @State private var savedVerdict: CaseVerdict?
+
+    /// The form needs a ticket number, a zone, and a plate before
+    /// anything can be saved. Location is optional.
+    private var canSave: Bool {
+        !number.trimmingCharacters(in: .whitespaces).isEmpty
+            && !zone.trimmingCharacters(in: .whitespaces).isEmpty
+            && !plate.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
+    /// First-pass verdict from the one question (S5). The full S6
+    /// case check weighs the evidence too and arrives in a later pass.
+    private var verdictForAnswer: CaseVerdict {
+        switch paidAnswer {
+        case .paid: return .strong
+        case .triedToPay: return .worthFiling
+        case .didNotPay: return .weak
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -129,14 +153,56 @@ struct AddTicketView: View {
 
     private var checkSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            AppPrimaryButton(title: "Check my case", systemImage: "checkmark.shield.fill") {}
-            Text("Saving and the case check arrive in the next update. Nothing is saved from this screen yet.")
-                .font(.footnote)
-                .foregroundStyle(.ink.opacity(0.7))
+            AppPrimaryButton(title: "Check my case", systemImage: "checkmark.shield.fill") {
+                saveTicket()
+            }
+            .disabled(!canSave)
+            .opacity(canSave ? 1 : 0.5)
+            if let savedTicketNumber, let savedVerdict {
+                Text("Ticket \(savedTicketNumber) saved. Case check: \(savedVerdict.rawValue). Find it in My Tickets.")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.ink)
+            } else if !canSave {
+                Text("Add a ticket number, a zone, and a plate to save.")
+                    .font(.footnote)
+                    .foregroundStyle(.ink.opacity(0.7))
+            }
         }
+    }
+
+    /// Builds a Ticket from the form and saves it to the store.
+    /// Code 821 is the Detroit standard: $45 fine, $22.50 inside the
+    /// discount window for registered Detroit plates. Other codes
+    /// keep the same amounts for now; per-code fines arrive later.
+    private func saveTicket() {
+        let ticket = Ticket(
+            number: number.trimmingCharacters(in: .whitespaces).uppercased(),
+            issueDate: issueDate,
+            zone: zone.trimmingCharacters(in: .whitespaces),
+            location: location.trimmingCharacters(in: .whitespaces),
+            plate: plate.trimmingCharacters(in: .whitespaces).uppercased(),
+            code: code.trimmingCharacters(in: .whitespaces),
+            fineNow: 22.50,
+            fineLater: 45.00,
+            paidAnswer: paidAnswer,
+            verdict: verdictForAnswer,
+            status: .notFiled
+        )
+        modelContext.insert(ticket)
+        try? modelContext.save()
+        savedTicketNumber = ticket.number
+        savedVerdict = ticket.verdict
+        number = ""
+        zone = ""
+        location = ""
+        plate = ""
+        code = "821"
+        issueDate = Date()
+        paidAnswer = .paid
     }
 }
 
 #Preview {
     AddTicketView()
+        .modelContainer(for: Ticket.self, inMemory: true)
 }

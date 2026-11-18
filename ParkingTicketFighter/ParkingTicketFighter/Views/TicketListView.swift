@@ -1,16 +1,21 @@
 import SwiftUI
+import SwiftData
 
 /// My Tickets. Every saved ticket with its status, sorted so the most
 /// urgent contest deadline comes first, the same ordering rule the
-/// fleet dashboard (S19) uses.
+/// fleet dashboard (S19) uses. Tickets come from the SwiftData store
+/// (`@Query`), so adds and deletes show up here right away.
 ///
 /// Editorial Brief: ruled rows with hairline rules, ticket numbers in
 /// serif, deadlines in red, status in small caps. Paper white always.
 struct TicketListView: View {
-    // Scaffold state: sample data stands in for saved records until
-    // persistence ports from the web build in a later pass.
-    private let tickets = SampleData.tickets.sorted {
-        $0.contestDeadline < $1.contestDeadline
+    @Query private var tickets: [Ticket]
+
+    /// Most urgent contest deadline first. The contest deadline is
+    /// computed from the issue date, so the sort happens here rather
+    /// than in the query itself.
+    private var sortedTickets: [Ticket] {
+        tickets.sorted { $0.contestDeadline < $1.contestDeadline }
     }
 
     var body: some View {
@@ -32,7 +37,7 @@ struct TicketListView: View {
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
-                            ForEach(tickets) { ticket in
+                            ForEach(sortedTickets) { ticket in
                                 NavigationLink(value: ticket) {
                                     TicketRow(ticket: ticket)
                                 }
@@ -55,4 +60,5 @@ struct TicketListView: View {
 
 #Preview {
     TicketListView()
+        .modelContainer(for: Ticket.self, inMemory: true)
 }
