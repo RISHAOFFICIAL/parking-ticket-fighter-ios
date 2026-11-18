@@ -77,6 +77,27 @@ final class Ticket {
     var filedDate: Date?
     var filedMethod: FilingMethod?
     var city: String
+    /// When the ticket was added. Drives the "file within 3 days" nudge.
+    var createdAt: Date
+    /// Front and back photos of the ticket, attached as evidence.
+    /// A photo that cannot be read stays attached either way.
+    /// Stored outside the database file so the store stays small.
+    @Attribute(.externalStorage) var frontPhotoData: Data?
+    @Attribute(.externalStorage) var backPhotoData: Data?
+    /// Photo of the filing confirmation or mailing receipt (S12/S13).
+    @Attribute(.externalStorage) var filingReceiptData: Data?
+    /// The statement in the user's own words (S8). Nil means the
+    /// generated draft is in use; see `statement`.
+    var statementText: String?
+    /// The evidence checklist (S7). Deleted with the ticket.
+    @Relationship(deleteRule: .cascade, inverse: \EvidenceItem.ticket)
+    var evidence: [EvidenceItem] = []
+    /// Result check-in (S15): "Not yet" snoozes the check by 2 weeks.
+    var resultCheckSnoozedUntil: Date?
+    /// Upheld result: what is now owed and the deadline to pay it,
+    /// taken from the result letter.
+    var resultAmountOwed: Double?
+    var resultPaymentDeadline: Date?
 
     init(
         id: UUID = UUID(),
@@ -93,7 +114,15 @@ final class Ticket {
         status: TicketStatus,
         filedDate: Date? = nil,
         filedMethod: FilingMethod? = nil,
-        city: String = "Detroit"
+        city: String = "Detroit",
+        createdAt: Date = Date(),
+        frontPhotoData: Data? = nil,
+        backPhotoData: Data? = nil,
+        filingReceiptData: Data? = nil,
+        statementText: String? = nil,
+        resultCheckSnoozedUntil: Date? = nil,
+        resultAmountOwed: Double? = nil,
+        resultPaymentDeadline: Date? = nil
     ) {
         self.id = id
         self.number = number
@@ -110,6 +139,14 @@ final class Ticket {
         self.filedDate = filedDate
         self.filedMethod = filedMethod
         self.city = city
+        self.createdAt = createdAt
+        self.frontPhotoData = frontPhotoData
+        self.backPhotoData = backPhotoData
+        self.filingReceiptData = filingReceiptData
+        self.statementText = statementText
+        self.resultCheckSnoozedUntil = resultCheckSnoozedUntil
+        self.resultAmountOwed = resultAmountOwed
+        self.resultPaymentDeadline = resultPaymentDeadline
     }
 
     /// Discount deadline: 5 days after the issue date.
@@ -141,19 +178,78 @@ final class Ticket {
         status.isOpen ? fineLater : 0
     }
 
+    /// Money saved when Detroit dismisses the ticket: the fine that
+    /// would otherwise have been owed. Feeds the lifetime total on Home.
+    var amountSaved: Double {
+        status == .dismissed ? fineLater : 0
+    }
+
+    /// The session proof item, when the ticket has one.
+    var sessionEvidence: EvidenceItem? {
+        evidence.first { $0.kind == .sessionProof }
+    }
+
+    /// Defenses found by the defense checker (S10).
+    var defenseEvidence: [EvidenceItem] {
+        evidence.filter { $0.kind == .defense && $0.state == .present }
+    }
+
+    /// The statement as it will go in the packet: the user's edited
+    /// words when they have edited it, otherwise the generated draft.
+    var statement: String {
+        statementText ?? statementDraft
+    }
+
     /// The written statement drafted from the facts, mirroring screen S8.
     /// The user edits this in their own words before anything is filed.
     /// The app never files anything; the user files the packet themselves.
+    /// When the paid session is on record, the draft names its window;
+    /// facts the app does not have are never invented.
     var statementDraft: String {
         let time = issueDate.formatted(date: .omitted, time: .shortened)
         switch paidAnswer {
         case .paid:
+            if let session = sessionEvidence,
+               let start = session.sessionStart,
+               let end = session.sessionEnd {
+                let startText = start.formatted(date: .omitted, time: .shortened)
+                let endText = end.formatted(date: .omitted, time: .shortened)
+                return "I paid for parking through the Park Detroit app for zone \(zone). My session ran \(startText) to \(endText). The ticket was issued at \(time), inside that paid window. A copy of my session receipt and card charge is attached."
+            }
             return "I paid for parking through the Park Detroit app for zone \(zone). The ticket was issued at \(time), inside that paid window. A copy of my session receipt and card charge is attached."
         case .triedToPay:
             return "I tried to pay for parking through the Park Detroit app for zone \(zone), but the payment did not go through. The ticket was issued at \(time). Screenshots of the app errors and my payment attempts are attached."
         case .didNotPay:
+            if let defense = defenseEvidence.first {
+                return "I am contesting ticket \(number) issued in zone \(zone). \(defense.note) Supporting evidence is attached."
+            }
             return "I am contesting ticket \(number) issued in zone \(zone). My reasons and supporting evidence are attached."
         }
+    }
+
+    /// Recomputes the verdict from the full S6 case check (answers,
+    /// evidence present or missing, session match, defenses found).
+    /// Call after any evidence change or answer change, then save.
+    func refreshVerdict() {
+        verdict = CaseCheck.evaluate(self).verdict
+    }
+
+    /// The day-30 result check date (S15), counted from filing.
+    var resultCheckDate: Date? {
+        guard let filedDate else { return nil }
+        return Calendar.current.date(
+            byAdding: .day,
+            value: DeadlineRules.resultCheckDaysAfterFiling,
+            to: filedDate
+        )
+    }
+
+    /// True when the day-30 "Did your letter arrive?" check-in is due:
+    /// filed and waiting, 30 days past filing, and not snoozed.
+    var resultCheckDue: Bool {
+        guard status == .filedWaiting, let checkDate = resultCheckDate else { return false }
+        if let snoozedUntil = resultCheckSnoozedUntil, snoozedUntil > Date() { return false }
+        return checkDate <= Date()
     }
 }
 

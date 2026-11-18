@@ -75,13 +75,43 @@ enum SampleData {
 
     static let tickets: [Ticket] = [appFailureTicket, paidSessionTicket, firstTicket]
 
-    /// The default evidence checklist from screen S7, one ticket at a time.
-    static let evidenceChecklist: [(label: String, help: String, isDone: Bool)] = [
-        ("Ticket photo", "Already attached when you add the ticket.", true),
-        ("Parking app proof", "Screenshot of the paid session. The app checks the session covers the ticket time and the zone matches.", false),
-        ("Card or bank charge", "Screenshot of the parking payment on your card or bank statement.", false),
-        ("Signs or meter photos (optional)", "Anything else that helps: sign photos, a broken meter, the curb.", false)
-    ]
+    /// The evidence checklist (S7) each sample ticket is seeded with,
+    /// matching the facts already recorded for it. The paid session
+    /// ticket has a session covering its ticket time and zone, plus
+    /// the card charge; the first ticket has its session but no card
+    /// charge yet; the app failure ticket has the failed payment
+    /// attempt as its proof. No ticket photo is seeded: photos are
+    /// added by the user, never invented.
+    static func evidence(for ticket: Ticket) -> [EvidenceItem] {
+        let items = EvidenceItem.defaultItems(for: ticket)
+        switch ticket.number {
+        case paidSessionTicket.number:
+            if let session = items.first(where: { $0.kind == .sessionProof }) {
+                session.state = .present
+                session.sessionStart = date(2026, 10, 9, 8, 1)
+                session.sessionEnd = date(2026, 10, 9, 10, 1)
+                session.sessionZone = "105"
+            }
+            if let card = items.first(where: { $0.kind == .cardCharge }) {
+                card.state = .present
+            }
+        case firstTicket.number:
+            if let session = items.first(where: { $0.kind == .sessionProof }) {
+                session.state = .present
+                session.sessionStart = date(2026, 10, 6, 10, 3)
+                session.sessionEnd = date(2026, 10, 6, 12, 3)
+                session.sessionZone = "105"
+            }
+        case appFailureTicket.number:
+            if let attempt = items.first(where: { $0.kind == .sessionProof }) {
+                attempt.state = .present
+                attempt.note = "Park Detroit showed \"Payment has not been processed\" errors that morning."
+            }
+        default:
+            break
+        }
+        return items
+    }
 
     /// Money totals for the Home summary, computed from the sample set
     /// the same way the finished app computes them from saved records.

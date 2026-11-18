@@ -13,6 +13,7 @@ import SwiftData
 /// caps text. Paper white always. No glass, no rounded cards.
 struct HomeView: View {
     @Query private var tickets: [Ticket]
+    @State private var resultTicket: Ticket?
 
     private var openTickets: [Ticket] {
         tickets.filter { $0.status.isOpen }
@@ -21,6 +22,16 @@ struct HomeView: View {
     /// Money still at risk across the open tickets.
     private var totalAtRisk: Double {
         openTickets.reduce(0) { $0 + $1.amountAtRisk }
+    }
+
+    /// Lifetime money saved by dismissed tickets.
+    private var totalSaved: Double {
+        tickets.reduce(0) { $0 + $1.amountSaved }
+    }
+
+    /// Filed tickets whose day-30 result check-in is due (S15).
+    private var dueResultTickets: [Ticket] {
+        tickets.filter { $0.resultCheckDue }
     }
 
     var body: some View {
@@ -35,8 +46,11 @@ struct HomeView: View {
 
                         if tickets.isEmpty {
                             emptyState
+                        } else if openTickets.isEmpty {
+                            allClearState
                         } else {
                             summaryPanel
+                            resultCheckInList
                             openTicketList
                         }
                     }
@@ -45,6 +59,42 @@ struct HomeView: View {
                 .contentMargins(.bottom, 16)
             }
             .toolbar(.hidden, for: .navigationBar)
+            .sheet(item: $resultTicket) { ticket in
+                ResultCheckInView(ticket: ticket, lifetimeSaved: totalSaved)
+            }
+        }
+    }
+
+    /// Home with all tickets resolved: "All clear. Nothing open."
+    /// plus the lifetime money saved total.
+    private var allClearState: some View {
+        BriefPanel {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("All clear. Nothing open.")
+                    .font(.briefHeadline(20, relativeTo: .title3))
+                Text("Lifetime saved: \(Money.format(totalSaved)).")
+                    .font(.subheadline.weight(.semibold))
+                Text("Every ticket is resolved. When a new one shows up, start from the Add Ticket tab.")
+                    .foregroundStyle(.ink.opacity(0.7))
+            }
+        }
+    }
+
+    /// Day-30 result check-ins that are due, one card each (S15).
+    private var resultCheckInList: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(dueResultTickets) { ticket in
+                BriefPanel {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Kicker(text: "Your result, ticket \(ticket.number)")
+                        Text("Did your letter arrive?")
+                            .font(.briefHeadline(20, relativeTo: .title3))
+                        AppPrimaryButton(title: "Record my result", systemImage: "envelope.fill") {
+                            resultTicket = ticket
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -88,6 +138,10 @@ struct HomeView: View {
                 Text("\(openTickets.count) open ticket(s). Filing freezes penalties while you wait on a result.")
                     .font(.footnote)
                     .foregroundStyle(.ink.opacity(0.7))
+                if totalSaved > 0 {
+                    Text("Lifetime saved: \(Money.format(totalSaved)).")
+                        .font(.footnote.weight(.semibold))
+                }
             }
         }
     }
@@ -142,5 +196,5 @@ struct TicketRow: View {
 
 #Preview {
     HomeView()
-        .modelContainer(for: Ticket.self, inMemory: true)
+        .modelContainer(for: [Ticket.self, EvidenceItem.self], inMemory: true)
 }

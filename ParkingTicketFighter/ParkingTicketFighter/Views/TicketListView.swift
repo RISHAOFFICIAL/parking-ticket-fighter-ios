@@ -60,5 +60,5 @@ struct TicketListView: View {
 
 #Preview {
     TicketListView()
-        .modelContainer(for: Ticket.self, inMemory: true)
+        .modelContainer(for: [Ticket.self, EvidenceItem.self], inMemory: true)
 }

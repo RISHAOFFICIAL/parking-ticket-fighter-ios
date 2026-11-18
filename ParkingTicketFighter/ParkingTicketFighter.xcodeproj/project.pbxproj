@@ -20,6 +20,20 @@
 		70000000000000000000000B /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000000B /* MoreView.swift */; };
 		70000000000000000000000C /* StubScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000000C /* StubScreens.swift */; };
 		70000000000000000000000E /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000000E /* AccountView.swift */; };
+		700000000000000000000010 /* EvidenceItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000010 /* EvidenceItem.swift */; };
+		700000000000000000000011 /* TicketOCR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000011 /* TicketOCR.swift */; };
+		700000000000000000000012 /* CaseCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000012 /* CaseCheck.swift */; };
+		700000000000000000000013 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000013 /* NotificationManager.swift */; };
+		700000000000000000000014 /* PacketBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000014 /* PacketBuilder.swift */; };
+		700000000000000000000015 /* PhotoCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000015 /* PhotoCapture.swift */; };
+		700000000000000000000016 /* ConfirmDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000016 /* ConfirmDetailsView.swift */; };
+		700000000000000000000017 /* CaseCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000017 /* CaseCheckView.swift */; };
+		700000000000000000000018 /* EvidenceChecklistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000018 /* EvidenceChecklistView.swift */; };
+		700000000000000000000019 /* StatementEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600000000000000000000019 /* StatementEditorView.swift */; };
+		70000000000000000000001A /* PacketPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000001A /* PacketPreviewView.swift */; };
+		70000000000000000000001B /* MarkFiledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000001B /* MarkFiledView.swift */; };
+		70000000000000000000001C /* ResultCheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000001C /* ResultCheckInView.swift */; };
+		70000000000000000000001D /* DefenseCheckerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000001D /* DefenseCheckerView.swift */; };
 		70000000000000000000000D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 60000000000000000000000D /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +52,20 @@
 		60000000000000000000000B /* MoreView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
 		60000000000000000000000C /* StubScreens.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StubScreens.swift; sourceTree = "<group>"; };
 		60000000000000000000000E /* AccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
+		600000000000000000000010 /* EvidenceItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EvidenceItem.swift; sourceTree = "<group>"; };
+		600000000000000000000011 /* TicketOCR.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TicketOCR.swift; sourceTree = "<group>"; };
+		600000000000000000000012 /* CaseCheck.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaseCheck.swift; sourceTree = "<group>"; };
+		600000000000000000000013 /* NotificationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		600000000000000000000014 /* PacketBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacketBuilder.swift; sourceTree = "<group>"; };
+		600000000000000000000015 /* PhotoCapture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCapture.swift; sourceTree = "<group>"; };
+		600000000000000000000016 /* ConfirmDetailsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmDetailsView.swift; sourceTree = "<group>"; };
+		600000000000000000000017 /* CaseCheckView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaseCheckView.swift; sourceTree = "<group>"; };
+		600000000000000000000018 /* EvidenceChecklistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EvidenceChecklistView.swift; sourceTree = "<group>"; };
+		600000000000000000000019 /* StatementEditorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatementEditorView.swift; sourceTree = "<group>"; };
+		60000000000000000000001A /* PacketPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacketPreviewView.swift; sourceTree = "<group>"; };
+		60000000000000000000001B /* MarkFiledView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkFiledView.swift; sourceTree = "<group>"; };
+		60000000000000000000001C /* ResultCheckInView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultCheckInView.swift; sourceTree = "<group>"; };
+		60000000000000000000001D /* DefenseCheckerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefenseCheckerView.swift; sourceTree = "<group>"; };
 		60000000000000000000000F /* ParkingTicketFighter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ParkingTicketFighter.entitlements; sourceTree = "<group>"; };
 		60000000000000000000000D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -77,6 +105,7 @@
 				100000000000000000000005 /* Models */,
 				100000000000000000000006 /* Views */,
 				100000000000000000000007 /* Components */,
+				100000000000000000000008 /* Services */,
 				60000000000000000000000D /* Assets.xcassets */,
 				60000000000000000000000F /* ParkingTicketFighter.entitlements */,
 			);
@@ -89,6 +118,7 @@
 				600000000000000000000003 /* Ticket.swift */,
 				600000000000000000000004 /* SampleData.swift */,
 				600000000000000000000005 /* DetroitFacts.swift */,
+				600000000000000000000010 /* EvidenceItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -103,6 +133,15 @@
 				60000000000000000000000B /* MoreView.swift */,
 				60000000000000000000000C /* StubScreens.swift */,
 				60000000000000000000000E /* AccountView.swift */,
+				600000000000000000000015 /* PhotoCapture.swift */,
+				600000000000000000000016 /* ConfirmDetailsView.swift */,
+				600000000000000000000017 /* CaseCheckView.swift */,
+				600000000000000000000018 /* EvidenceChecklistView.swift */,
+				600000000000000000000019 /* StatementEditorView.swift */,
+				60000000000000000000001A /* PacketPreviewView.swift */,
+				60000000000000000000001B /* MarkFiledView.swift */,
+				60000000000000000000001C /* ResultCheckInView.swift */,
+				60000000000000000000001D /* DefenseCheckerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -113,6 +152,17 @@
 				600000000000000000000006 /* GlassComponents.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		100000000000000000000008 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				600000000000000000000011 /* TicketOCR.swift */,
+				600000000000000000000012 /* CaseCheck.swift */,
+				600000000000000000000013 /* NotificationManager.swift */,
+				600000000000000000000014 /* PacketBuilder.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -197,6 +247,20 @@
 				70000000000000000000000B /* MoreView.swift in Sources */,
 				70000000000000000000000C /* StubScreens.swift in Sources */,
 				70000000000000000000000E /* AccountView.swift in Sources */,
+				700000000000000000000010 /* EvidenceItem.swift in Sources */,
+				700000000000000000000011 /* TicketOCR.swift in Sources */,
+				700000000000000000000012 /* CaseCheck.swift in Sources */,
+				700000000000000000000013 /* NotificationManager.swift in Sources */,
+				700000000000000000000014 /* PacketBuilder.swift in Sources */,
+				700000000000000000000015 /* PhotoCapture.swift in Sources */,
+				700000000000000000000016 /* ConfirmDetailsView.swift in Sources */,
+				700000000000000000000017 /* CaseCheckView.swift in Sources */,
+				700000000000000000000018 /* EvidenceChecklistView.swift in Sources */,
+				700000000000000000000019 /* StatementEditorView.swift in Sources */,
+				70000000000000000000001A /* PacketPreviewView.swift in Sources */,
+				70000000000000000000001B /* MarkFiledView.swift in Sources */,
+				70000000000000000000001C /* ResultCheckInView.swift in Sources */,
+				70000000000000000000001D /* DefenseCheckerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -325,6 +389,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Beat the Meter";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Beat the Meter uses the camera to photograph your parking ticket and your evidence, so it can read the ticket details and attach the photos to your contest packet.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Beat the Meter uses your photo library so you can attach a photo of your parking ticket and your evidence to your contest packet.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -352,6 +418,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Beat the Meter";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Beat the Meter uses the camera to photograph your parking ticket and your evidence, so it can read the ticket details and attach the photos to your contest packet.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Beat the Meter uses your photo library so you can attach a photo of your parking ticket and your evidence to your contest packet.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

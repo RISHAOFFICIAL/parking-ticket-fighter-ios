@@ -2,10 +2,12 @@ import SwiftUI
 import SwiftData
 
 /// Ticket detail. Mirrors the tracking screen (S14): the facts, both
-/// deadlines up front, the status timeline, the drafted statement (S8),
-/// and the evidence checklist (S7). Delete is wired: the button at
-/// the bottom removes the ticket from the store after a confirmation.
-/// Editing, packet building, and the pay gate port in later passes.
+/// deadlines up front, the status timeline, the case check (S6), the
+/// statement (S8), the evidence checklist (S7), the ticket photos,
+/// the packet (S9), mark as filed (S13), the result check-in (S15),
+/// and the Detroit filing routes (S12). Delete is wired: the button
+/// at the bottom removes the ticket from the store after a
+/// confirmation, and cancels its reminders.
 ///
 /// Editorial Brief: the detail reads as a case brief. Labeled fields
 /// in ruled two column rows, deadlines as red marginalia, status in
@@ -13,21 +15,35 @@ import SwiftData
 struct TicketDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Query private var allTickets: [Ticket]
 
     let ticket: Ticket
 
     @State private var showingDeleteConfirmation = false
+    @State private var showingCaseCheck = false
+    @State private var showingMarkFiled = false
+    @State private var showingResultCheckIn = false
+
+    private var lifetimeSaved: Double {
+        allTickets.reduce(0) { $0 + $1.amountSaved }
+    }
 
     var body: some View {
         ZStack {
             Color.paper.ignoresSafeArea()
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    if ticket.resultCheckDue {
+                        resultCheckInPanel
+                    }
                     verdictPanel
                     factsCard
                     deadlinesCard
+                    photosCard
+                    statusCard
                     statementCard
                     evidenceCard
+                    packetCard
                     filingCard
                     deleteSection
                 }
@@ -43,6 +59,7 @@ struct TicketDetailView: View {
             titleVisibility: .visible
         ) {
             Button("Delete ticket", role: .destructive) {
+                NotificationManager.cancel(for: ticket)
                 modelContext.delete(ticket)
                 try? modelContext.save()
                 dismiss()
@@ -50,6 +67,15 @@ struct TicketDetailView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This removes the ticket and its deadlines. It cannot be undone.")
+        }
+        .sheet(isPresented: $showingCaseCheck) {
+            CaseCheckView(ticket: ticket)
+        }
+        .sheet(isPresented: $showingMarkFiled) {
+            MarkFiledView(ticket: ticket)
+        }
+        .sheet(isPresented: $showingResultCheckIn) {
+            ResultCheckInView(ticket: ticket, lifetimeSaved: lifetimeSaved)
         }
     }
 
@@ -65,6 +91,20 @@ struct TicketDetailView: View {
         }
     }
 
+    /// The day-30 result check-in (S15), shown when it is due.
+    private var resultCheckInPanel: some View {
+        BriefPanel {
+            VStack(alignment: .leading, spacing: 8) {
+                Kicker(text: "Your result")
+                Text("Did your letter arrive?")
+                    .font(.briefHeadline(20, relativeTo: .title3))
+                AppPrimaryButton(title: "Record my result", systemImage: "envelope.fill") {
+                    showingResultCheckIn = true
+                }
+            }
+        }
+    }
+
     /// The case check verdict (S6), on a brief panel with a thick top
     /// rule. The verdict is small caps ink text, with the reason in words.
     private var verdictPanel: some View {
@@ -72,20 +112,14 @@ struct TicketDetailView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Kicker(text: "Case check")
                 StatusCaps(text: ticket.verdict.rawValue)
-                Text(verdictReason)
+                Text(CaseCheck.evaluate(ticket).reason)
                     .font(.subheadline)
+                Button("See the full case check") {
+                    showingCaseCheck = true
+                }
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.ink)
             }
-        }
-    }
-
-    private var verdictReason: String {
-        switch ticket.verdict {
-        case .strong:
-            return "You paid, and the time and zone line up. Tickets like this get dismissed when the proof is filed right."
-        case .worthFiling:
-            return "Your proof is partial. The evidence checklist below shows what would make it stronger."
-        case .weak:
-            return "Honest answer: this one is unlikely to be dismissed. Paying the discounted amount by the discount date may cost less than contesting, if you live in Detroit and your plate is registered in the City's Detroit Discount program."
         }
     }
 
@@ -102,7 +136,7 @@ struct TicketDetailView: View {
                     Text(ticket.zone).font(.subheadline)
                 }
                 RuledRow(label: "Location") {
-                    Text(ticket.location).font(.subheadline)
+                    Text(ticket.location.isEmpty ? "Not recorded" : ticket.location).font(.subheadline)
                 }
                 RuledRow(label: "Plate") {
                     Text(ticket.plate).font(.subheadline)
@@ -137,12 +171,57 @@ struct TicketDetailView: View {
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(.signal)
                 }
+                if ticket.status == .upheld, let owed = ticket.resultAmountOwed, let deadline = ticket.resultPaymentDeadline {
+                    DeadlineCaps(text: "Pay \(Money.format(owed)) by \(deadline.formatted(date: .abbreviated, time: .omitted))")
+                }
             }
         }
     }
 
+    /// Front and back ticket photos, attached as evidence. A photo can
+    /// be added or retaken here even when the ticket was typed in.
+    private var photosCard: some View {
+        BriefPanel {
+            VStack(alignment: .leading, spacing: 16) {
+                Kicker(text: "Ticket photos")
+                PhotoSlotView(
+                    title: "Front of ticket",
+                    photoData: ticket.frontPhotoData,
+                    onPhoto: { image in
+                        ticket.frontPhotoData = PhotoStorage.jpegData(for: image)
+                        markTicketPhotoPresent()
+                        try? modelContext.save()
+                    },
+                    onRemove: {
+                        ticket.frontPhotoData = nil
+                        try? modelContext.save()
+                    }
+                )
+                PhotoSlotView(
+                    title: "Back of ticket",
+                    photoData: ticket.backPhotoData,
+                    onPhoto: { image in
+                        ticket.backPhotoData = PhotoStorage.jpegData(for: image)
+                        try? modelContext.save()
+                    },
+                    onRemove: {
+                        ticket.backPhotoData = nil
+                        try? modelContext.save()
+                    }
+                )
+            }
+        }
+    }
+
+    /// A front photo marks the ticket photo evidence item done.
+    private func markTicketPhotoPresent() {
+        if let photoItem = ticket.evidence.first(where: { $0.kind == .ticketPhoto }) {
+            photoItem.state = .present
+        }
+    }
+
     /// Status timeline (S14): Added, Packet built, Filed, Waiting on result.
-    private var statementCard: some View {
+    private var statusCard: some View {
         BriefPanel {
             VStack(alignment: .leading, spacing: 8) {
                 Kicker(text: "Status")
@@ -155,13 +234,30 @@ struct TicketDetailView: View {
                         .font(.footnote)
                         .foregroundStyle(.ink.opacity(0.7))
                 }
-                Divider()
-                    .background(Color.ink.opacity(0.2))
-                Kicker(text: "Your statement (draft)")
-                Text(ticket.statementDraft)
+                if ticket.status == .notFiled || ticket.status == .packetBuilt {
+                    AppPrimaryButton(title: "I filed it", systemImage: "checkmark.seal.fill") {
+                        showingMarkFiled = true
+                    }
+                }
+            }
+        }
+    }
+
+    private var statementCard: some View {
+        BriefPanel {
+            VStack(alignment: .leading, spacing: 8) {
+                Kicker(text: "Your statement")
+                Text(ticket.statement)
                     .font(.subheadline)
                 Text("Sign only what is true. You can edit this in your own words before anything is filed.")
                     .font(.footnote.weight(.semibold))
+                NavigationLink {
+                    StatementEditorView(ticket: ticket)
+                } label: {
+                    Text("Edit statement")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.ink)
+                }
             }
         }
     }
@@ -171,21 +267,65 @@ struct TicketDetailView: View {
             VStack(alignment: .leading, spacing: 0) {
                 Kicker(text: "Evidence checklist")
                     .padding(.bottom, 8)
-                ForEach(SampleData.evidenceChecklist, id: \.label) { item in
+                if ticket.evidence.isEmpty {
+                    Text("No evidence items yet. Add them from the checklist.")
+                        .font(.subheadline)
+                        .foregroundStyle(.ink.opacity(0.7))
+                }
+                ForEach(ticket.evidence) { item in
                     VStack(alignment: .leading, spacing: 0) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Label(item.label, systemImage: item.isDone ? "checkmark.square.fill" : "square")
+                            Label(item.label, systemImage: item.state == .present ? "checkmark.square.fill" : item.state == .missing ? "xmark.square.fill" : "square")
                                 .font(.subheadline.weight(.medium))
                                 .foregroundStyle(.ink)
                             Text(item.help)
                                 .font(.footnote)
                                 .foregroundStyle(.ink.opacity(0.7))
+                            if item.kind == .sessionProof, let matchText = item.sessionMatchText(for: ticket) {
+                                Text(matchText)
+                                    .font(.footnote.weight(.semibold))
+                                    .foregroundStyle(item.sessionMatch(for: ticket) == .covers ? .ink : .signal)
+                            }
                         }
                         .padding(.vertical, 8)
                         Divider()
                             .background(Color.ink.opacity(0.2))
                     }
                 }
+                NavigationLink {
+                    EvidenceChecklistView(ticket: ticket)
+                } label: {
+                    Text("Edit evidence")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.ink)
+                }
+                .padding(.top, 8)
+            }
+        }
+    }
+
+    private var packetCard: some View {
+        BriefPanel {
+            VStack(alignment: .leading, spacing: 8) {
+                Kicker(text: "Your packet")
+                Text("Cover summary, statement, ticket photo, evidence, and deadlines, as it will be filed.")
+                    .font(.subheadline)
+                    .foregroundStyle(.ink.opacity(0.7))
+                NavigationLink {
+                    PacketPreviewView(ticket: ticket)
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "doc.richtext.fill")
+                        Text("Preview packet")
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(Color.ink)
+                    .foregroundStyle(.white)
+                }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -204,7 +344,7 @@ struct TicketDetailView: View {
                 RuledRow(label: "Phone") {
                     Text(DetroitFacts.phone).font(.subheadline)
                 }
-                Text("Your packet is free during launch. In this scaffold no payment is processed and no card is stored.")
+                Text("Your packet is free during launch. In this build no payment is processed and no card is stored.")
                     .font(.footnote)
                     .foregroundStyle(.ink.opacity(0.7))
                     .padding(.top, 8)
@@ -217,5 +357,5 @@ struct TicketDetailView: View {
     NavigationStack {
         TicketDetailView(ticket: SampleData.appFailureTicket)
     }
-    .modelContainer(for: Ticket.self, inMemory: true)
+    .modelContainer(for: [Ticket.self, EvidenceItem.self], inMemory: true)
 }

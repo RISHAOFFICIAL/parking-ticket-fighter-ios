@@ -49,6 +49,7 @@ struct ContentView: View {
         .preferredColorScheme(.light)
         .task {
             seedSampleTicketsIfNeeded()
+            await refreshReminders()
         }
     }
 
@@ -62,8 +63,20 @@ struct ContentView: View {
         guard let existing = try? modelContext.fetch(descriptor), existing.isEmpty else { return }
         for ticket in SampleData.tickets {
             modelContext.insert(ticket)
+            for item in SampleData.evidence(for: ticket) {
+                modelContext.insert(item)
+            }
         }
         try? modelContext.save()
+    }
+
+    /// Launch safety net: reschedules every ticket's reminders from
+    /// its current deadlines and status, so reminders stay right
+    /// even if a save was missed. Past dates are skipped.
+    private func refreshReminders() async {
+        let descriptor = FetchDescriptor<Ticket>()
+        guard let tickets = try? modelContext.fetch(descriptor) else { return }
+        await NotificationManager.rescheduleAll(tickets)
     }
 
     /// The bottom bar. A white bar with a black top rule and black text,
@@ -137,5 +150,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Ticket.self, inMemory: true)
+        .modelContainer(for: [Ticket.self, EvidenceItem.self], inMemory: true)
 }

@@ -205,3 +205,134 @@ registered in the City's Detroit Discount program.
   matching, the full S6 case check, statement editing, packet building,
   pay, mark as filed and result check-in, duplicate review, fleet, and
   local notifications.
+
+## Core fight flow built (Nov 18, 2026)
+
+Built in the VM, NOT compile verified: no Xcode or Swift compiler on
+the VM, and Risha's Mac was offline. First build on her Mac is the
+deciding check. What was verified here instead: every Swift file
+balances (braces, parens, brackets, string interpolations), no em
+dashes in app copy, no stale references to removed code, and the
+project file lists every new file in all four places (file reference,
+build file, group, sources phase) with balanced braces. Camera and
+photo library usage descriptions were added to both build configs.
+
+- Photo capture (S3): front and back slots on Add Ticket and on ticket
+  detail, camera plus photo library. Photos are downscaled to 2000px
+  and stored as JPEG on the ticket with SwiftData external storage.
+  A photo that cannot be read stays attached as evidence either way.
+- OCR (S3/S4): on-device Vision text recognition, free and private,
+  no server. Reads ticket number, date and time issued, zone,
+  location, plate, and fine amount from front and back. Confirm
+  Details shows what was read with every field editable and a "These
+  are right" confirmation; a missing or impossible issue date is
+  flagged in place ("We need the issue date to calculate your
+  deadline") and must be picked before confirming. Unreadable photo
+  and not-a-ticket messages use the approved wording. OCR is NOT
+  claimed as working until the real ticket photo test passes; see
+  07-native/ocr-verification-checklist.md.
+- Full S6 case check: verdict logic weighs the paid answer, the
+  session proof and whether it covers the ticket time and zone, the
+  card charge, and any defense found. Verdict, reason in plain words,
+  both deadlines up front, and the one gap that would most improve
+  the case. Weak verdict shows the honest advice with the $22.50 vs
+  $45 plus late fees math and the "Pay it (we show you where)" and
+  "Contest anyway" paths. The app never blocks a user from filing.
+  The pay path includes the Detroit Discount registration link and
+  an "I paid it" step that closes the ticket.
+- Defense checker (S10): five questions, one at a time. Each yes
+  attaches the matching evidence item and updates the case check.
+- Evidence checklist (S7): per-ticket SwiftData items (ticket photo,
+  parking app proof, card or bank charge, signs or meter, defenses,
+  extra photos). Photo attach per item, session start/end/zone
+  fields, live session match text ("This session covers your ticket
+  time. Zone matches." or the mismatch warning with minutes), and
+  "I do not have this" per item. The case check re-runs on every
+  change. The statement draft names the session window when it is
+  on record.
+- Statement editing (S8): the user edits the drafted statement in
+  their own words, with the "Sign only what is true" warning and a
+  reset-to-draft option. Edited text is stored on the ticket.
+- Packet building and preview (S9): full packet as it will be filed
+  (cover summary, statement, ticket photo, evidence pages, deadlines
+  page) with a "This looks right" confirmation that marks the packet
+  built, plus share/export of the packet as a PDF (Save to Files,
+  AirDrop, mail, print). Packet is free during launch.
+- Mark as filed (S13): date picker (no future dates) plus method
+  picker, optional confirmation or mailing receipt photo, moves the
+  ticket to Filed, waiting on result.
+- Result check-in (S15): due at day 30 after filing, prompted from
+  Home and ticket detail. Dismissed shows a celebration with the
+  money saved and the lifetime total; Upheld records what is owed
+  and the pay-by date from the letter; Not yet snoozes 2 weeks.
+  Home shows the lifetime money saved total and "All clear. Nothing
+  open." when every ticket is resolved.
+- Local notifications: discount deadline minus 3 days, contest
+  deadline minus 5 and minus 1 day, not-filed nudge at 3 days after
+  adding, filed-but-no-result at day 30, upheld payment deadline
+  minus 3 days. Every reminder names the ticket number and the exact
+  dollar amount at risk. Permission is asked at first ticket save.
+  Reminders reschedule on edit, filing, and result, cancel on
+  delete, and refresh at launch. See notifications-plan.md.
+- Display name: already "Beat the Meter" in the project (commit
+  32fbe74); bundle ID unchanged.
+
+## Testing and verification notes (Nov 18, 2026)
+
+Run on Risha's Mac, first build after pull:
+1. Clean build in Xcode, run on the iPhone 17 Pro simulator, then on
+   her real iPhone via TestFlight. Existing installs carry the old
+   SwiftData store; the new fields and the EvidenceItem model should
+   migrate automatically, but if the app crashes on launch, delete
+   and reinstall (test data only, no real user data exists yet).
+2. Add a ticket by typing: save, confirm the case check sheet shows
+   the verdict and both deadlines, confirm it appears on Home and My
+   Tickets with the right deadlines (issue plus 5 days, issue plus
+   30 days).
+3. Photo path: photograph a real ticket, front and back. Confirm the
+   read fields land on Confirm Details, every field is editable, and
+   the ticket saves with both photos attached. Then run the full
+   OCR checklist in 07-native/ocr-verification-checklist.md.
+4. Evidence: attach a session proof with times covering the ticket
+   and the matching zone, confirm "This session covers your ticket
+   time. Zone matches." Then change the session end to before the
+   ticket time and confirm the mismatch warning names the minutes.
+   Mark an item "I do not have this" and confirm the verdict updates.
+5. Weak case: add a did-not-pay ticket with no defense, confirm the
+   honest advice math, try "Pay it" (shows where to pay, "I paid it"
+   closes the ticket) and "Contest anyway" (continues to evidence).
+   Run the defense checker, answer yes to one defense, confirm the
+   verdict moves to Worth filing.
+6. Statement: edit the statement, save, confirm the packet preview
+   shows the edited words. Reset to draft, confirm the draft returns.
+7. Packet: open the packet preview, tap "This looks right", confirm
+   the status moves to Packet built. Share the PDF, open it, confirm
+   all five sections are there and the photos render.
+8. Filing and result: mark a ticket filed (each method), confirm the
+   status and the day-30 prompt timing. For the result check-in,
+   file a ticket with a backdated filed date 30 days ago to make the
+   check-in due, then walk Dismissed (money saved on Home), Upheld
+   (amount owed and deadline shown), and Not yet (snoozes 2 weeks).
+9. Notifications: save a first ticket and confirm the permission
+   prompt appears once. Set a ticket's issue date so a reminder
+   falls tomorrow, confirm it fires at 9 a.m. with the ticket number
+   and dollar amount. Delete a ticket and confirm its reminders stop.
+10. Regression: the three seeded sample tickets still show with the
+    right verdicts and deadlines, and deleting one still asks first.
+
+## Still to build (after Nov 18, 2026)
+
+- Pay (S11): NOT built. Packet is free during launch; charging needs
+  Risha's approval and the App Store version first. Trigger is 100
+  waitlist signups or 25 packets built.
+- Duplicate review (S16): NOT built. The build spec lists it as a
+  should-have in v1, but it was left out of this pass on the
+  coordinator's direction; it remains open work.
+- Fleet (S17-S21): NOT built. The build spec lists fleet as a
+  should-have/nice-to-have in v1, but it was left out of this pass
+  on the coordinator's direction; it remains open work.
+- Welcome (S1) and How it works (S2) first-launch flow: still stubs.
+- RELEASE BLOCKER, unchanged: remove the sample-data seed before App
+  Store release. A real user must never see someone else's tickets.
+- OCR verification with a real ticket photo is still open (see the
+  checklist). Do not claim OCR works until it passes.

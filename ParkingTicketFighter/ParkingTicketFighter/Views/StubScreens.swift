@@ -2,18 +2,18 @@ import SwiftUI
 
 /// STUB SCREENS, clearly marked.
 ///
-/// The approved flow has 21 screens (S1 to S21). This scaffold ports the
-/// top level structure for real (Home, My Tickets, Add Ticket, More)
-/// and shows ticket detail with real facts and deadline math. Every
-/// other approved screen is a placeholder stub below, labeled with its
+/// The approved flow has 21 screens (S1 to S21). The core fight flow
+/// is built (S3 photo and OCR, S4 confirm details, S5 the one
+/// question, S6 case check, S7 evidence, S8 statement, S9 packet,
+/// S10 defense checker, S12 filing instructions, S13 mark as filed,
+/// S14 tracking, S15 result check-in) plus local reminders. The
+/// screens below are still placeholder stubs, labeled with their
 /// screen number so nothing is silently missing and nothing here
 /// pretends to be finished work.
 ///
-/// Porting order follows the approved flows: core fight flow first
-/// (S6 case check, S7 evidence, S8 statement, S9 packet, S11 pay),
-/// then tracking (S13 to S15), then duplicate review (S16), then the
-/// fleet flow (S17 to S21). Photo reading and AI features port last,
-/// and only once each is verified, matching the web build's limits.
+/// Remaining order: S1 welcome, then S11 pay (only after launch, when
+/// Risha approves charging), then S16 duplicate review, then the
+/// fleet flow (S17 to S21).
 ///
 /// Editorial Brief: paper white, ruled panels, small caps, no glass.
 struct ScreenStub: Identifiable {
@@ -27,14 +27,7 @@ struct ScreenStub: Identifiable {
 enum StubCatalog {
     static let remaining: [ScreenStub] = [
         ScreenStub(screenID: "S1", title: "Welcome", note: "One line of promise and two routes: fight a ticket, or the fleet flow. Ports with the first launch pass."),
-        ScreenStub(screenID: "S6", title: "Case check", note: "The verdict engine (Strong, Worth filing, Weak) with both deadlines up front. The sample tickets already carry verified verdicts."),
-        ScreenStub(screenID: "S7", title: "Evidence checklist", note: "Guided one item at a time, with session coverage and zone matching checks and mismatch warnings."),
-        ScreenStub(screenID: "S8", title: "Your statement", note: "The editable statement. The draft text already generates from ticket facts in the model; this screen adds editing."),
-        ScreenStub(screenID: "S9", title: "Packet preview", note: "Cover summary, statement, ticket photo, evidence pages, deadlines page, in one printable packet."),
-        ScreenStub(screenID: "S10", title: "Defense checker", note: "Broken meter, hidden sign, loading, emergency, wrong plate. Each yes attaches evidence and updates the case check."),
         ScreenStub(screenID: "S11", title: "Pay", note: "Shown only at packet completion. The packet is free during launch; the plan after launch is $15 per packet, first ticket free. Real payment needs a processor connected with approval. Until then, no card is charged or stored."),
-        ScreenStub(screenID: "S13", title: "Mark as filed", note: "Pick the date and method filed. Moves the ticket to Filed, waiting on result."),
-        ScreenStub(screenID: "S15", title: "Result check in", note: "At day 30: Dismissed (shows money saved), Upheld (shows what is owed and by when), or Not yet (snoozes two weeks)."),
         ScreenStub(screenID: "S16", title: "Duplicate review", note: "Suspected duplicate parking charges side by side, with a dispute summary to take to the bank. The app never contacts the bank."),
         ScreenStub(screenID: "S17", title: "Fleet setup", note: "Business name and vehicles for the fleet flow (Marcus). Per vehicle monthly plan."),
         ScreenStub(screenID: "S18", title: "Driver invite", note: "Drivers join by link, see only Add a ticket, and their tickets land on the fleet dashboard."),

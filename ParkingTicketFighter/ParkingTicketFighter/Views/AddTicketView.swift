@@ -3,14 +3,18 @@ import SwiftData
 
 /// Add Ticket. The entry point of the core fight flow (S3, S4, S5).
 ///
-/// Saving is wired: "Check my case" builds a Ticket from the form,
-/// inserts it into the SwiftData store, and shows the case check
-/// verdict. The verdict here is the first-pass rule from the approved
-/// flow: paid means Strong, tried to pay means Worth filing, did not
-/// pay means Weak. The full S6 case check, which weighs the evidence,
-/// arrives in a later pass. Photo reading (OCR) is not claimed
-/// anywhere until it is verified working with a real ticket photo,
-/// the same honest limit the web build carries.
+/// The ticket comes in by photo (front and back) or by typing. Photos
+/// are read on the phone with Vision text recognition (free, private,
+/// no server) and the read fields land on Confirm Details (S4), where
+/// every field is editable and nothing is saved until the user taps
+/// "These are right." A photo that cannot be read stays attached as
+/// evidence either way. "Check my case" saves the ticket, builds its
+/// evidence checklist, runs the full S6 case check, asks for
+/// notification permission at first save, and shows the case check.
+///
+/// Honest limit: photo reading is not claimed as working until it is
+/// verified with a real ticket photo. See
+/// 07-native/ocr-verification-checklist.md.
 ///
 /// Editorial Brief: paper white, ruled rows, black square buttons.
 /// Every field carries a persistent label above it, never a
@@ -25,8 +29,16 @@ struct AddTicketView: View {
     @State private var code = "821"
     @State private var issueDate = Date()
     @State private var paidAnswer: PaidAnswer = .paid
-    @State private var savedTicketNumber: String?
-    @State private var savedVerdict: CaseVerdict?
+    @State private var fineNow = DetroitFacts.code821DiscountFine
+    @State private var fineLater = DetroitFacts.code821FullFine
+
+    @State private var frontPhotoData: Data?
+    @State private var backPhotoData: Data?
+
+    @State private var isReadingPhoto = false
+    @State private var photoMessage: String?
+    @State private var pendingReading: OCRReading?
+    @State private var savedTicket: Ticket?
 
     /// The form needs a ticket number, a zone, and a plate before
     /// anything can be saved. Location is optional.
@@ -34,16 +46,6 @@ struct AddTicketView: View {
         !number.trimmingCharacters(in: .whitespaces).isEmpty
             && !zone.trimmingCharacters(in: .whitespaces).isEmpty
             && !plate.trimmingCharacters(in: .whitespaces).isEmpty
-    }
-
-    /// First-pass verdict from the one question (S5). The full S6
-    /// case check weighs the evidence too and arrives in a later pass.
-    private var verdictForAnswer: CaseVerdict {
-        switch paidAnswer {
-        case .paid: return .strong
-        case .triedToPay: return .worthFiling
-        case .didNotPay: return .weak
-        }
     }
 
     var body: some View {
@@ -63,16 +65,54 @@ struct AddTicketView: View {
             }
             .navigationTitle("Add Ticket")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(item: $pendingReading) { reading in
+                ConfirmDetailsView(
+                    reading: reading,
+                    onConfirm: { confirmed in
+                        applyConfirmed(confirmed)
+                        pendingReading = nil
+                    },
+                    onCancel: { pendingReading = nil }
+                )
+            }
+            .sheet(item: $savedTicket) { ticket in
+                CaseCheckView(ticket: ticket)
+            }
         }
     }
 
     private var photoSection: some View {
         BriefPanel {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 16) {
                 Kicker(text: "Start with the ticket")
-                AppSecondaryButton(title: "Take a photo of the ticket", systemImage: "camera.fill") {}
-                AppSecondaryButton(title: "Upload a photo", systemImage: "photo.on.rectangle") {}
-                Text("The photo stays attached as evidence either way. If the app cannot read it clearly, you can type the details instead. Photo reading arrives in a later pass and will only be switched on once it is verified.")
+                PhotoSlotView(
+                    title: "Front of ticket",
+                    photoData: frontPhotoData,
+                    onPhoto: { image in
+                        frontPhotoData = PhotoStorage.jpegData(for: image)
+                        runOCR()
+                    },
+                    onRemove: { frontPhotoData = nil }
+                )
+                PhotoSlotView(
+                    title: "Back of ticket",
+                    photoData: backPhotoData,
+                    onPhoto: { image in
+                        backPhotoData = PhotoStorage.jpegData(for: image)
+                        runOCR()
+                    },
+                    onRemove: { backPhotoData = nil }
+                )
+                if isReadingPhoto {
+                    Text("Reading your ticket...")
+                        .font(.footnote.weight(.semibold))
+                }
+                if let photoMessage {
+                    Text(photoMessage)
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.signal)
+                }
+                Text("The photo stays attached as evidence either way. If the app cannot read it clearly, you can type the details instead.")
                     .font(.footnote)
                     .foregroundStyle(.ink.opacity(0.7))
             }
@@ -158,11 +198,7 @@ struct AddTicketView: View {
             }
             .disabled(!canSave)
             .opacity(canSave ? 1 : 0.5)
-            if let savedTicketNumber, let savedVerdict {
-                Text("Ticket \(savedTicketNumber) saved. Case check: \(savedVerdict.rawValue). Find it in My Tickets.")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.ink)
-            } else if !canSave {
+            if !canSave {
                 Text("Add a ticket number, a zone, and a plate to save.")
                     .font(.footnote)
                     .foregroundStyle(.ink.opacity(0.7))
@@ -170,10 +206,55 @@ struct AddTicketView: View {
         }
     }
 
-    /// Builds a Ticket from the form and saves it to the store.
-    /// Code 821 is the Detroit standard: $45 fine, $22.50 inside the
-    /// discount window for registered Detroit plates. Other codes
-    /// keep the same amounts for now; per-code fines arrive later.
+    // MARK: - Photo reading
+
+    /// Reads the attached photos (front, then back) with on-device
+    /// Vision OCR. A readable ticket opens Confirm Details. An
+    /// unreadable photo or a photo that is not a ticket shows the
+    /// approved message, and the photo stays attached either way.
+    private func runOCR() {
+        let images = [frontPhotoData, backPhotoData].compactMap { $0 }.compactMap { UIImage(data: $0) }
+        guard !images.isEmpty else { return }
+        isReadingPhoto = true
+        photoMessage = nil
+        Task {
+            let reading = await TicketOCR.recognize(images: images)
+            await MainActor.run {
+                isReadingPhoto = false
+                if !reading.looksLikeTicket {
+                    photoMessage = "That does not look like a parking ticket. Retake, or continue typing details by hand."
+                } else if reading.isUnreadable {
+                    photoMessage = "We could not read that clearly. Try again in better light, or type the ticket number instead."
+                } else {
+                    pendingReading = reading
+                }
+            }
+        }
+    }
+
+    /// Fills the form from the fields the user confirmed on S4. When
+    /// the photo gave a fine amount, it becomes the full fine and the
+    /// discounted fine is half of it (the Detroit Discount is 50%).
+    private func applyConfirmed(_ confirmed: ConfirmedTicketFields) {
+        number = confirmed.number
+        issueDate = confirmed.issueDate
+        zone = confirmed.zone
+        location = confirmed.location
+        plate = confirmed.plate
+        if let fine = confirmed.fineAmount, fine > 0 {
+            fineLater = fine
+            fineNow = (fine / 2).rounded(toPlaces: 2)
+        }
+        photoMessage = nil
+    }
+
+    // MARK: - Saving
+
+    /// Builds a Ticket from the form and saves it to the store, with
+    /// its photos and default evidence checklist. The verdict comes
+    /// from the full S6 case check, not the first-pass rule. First
+    /// save asks for notification permission; every save schedules
+    /// the ticket's reminders.
     private func saveTicket() {
         let ticket = Ticket(
             number: number.trimmingCharacters(in: .whitespaces).uppercased(),
@@ -182,16 +263,29 @@ struct AddTicketView: View {
             location: location.trimmingCharacters(in: .whitespaces),
             plate: plate.trimmingCharacters(in: .whitespaces).uppercased(),
             code: code.trimmingCharacters(in: .whitespaces),
-            fineNow: 22.50,
-            fineLater: 45.00,
+            fineNow: fineNow,
+            fineLater: fineLater,
             paidAnswer: paidAnswer,
-            verdict: verdictForAnswer,
-            status: .notFiled
+            verdict: .weak,
+            status: .notFiled,
+            frontPhotoData: frontPhotoData,
+            backPhotoData: backPhotoData
         )
         modelContext.insert(ticket)
+        for item in EvidenceItem.defaultItems(for: ticket) {
+            modelContext.insert(item)
+        }
+        ticket.refreshVerdict()
         try? modelContext.save()
-        savedTicketNumber = ticket.number
-        savedVerdict = ticket.verdict
+        Task {
+            await NotificationManager.requestPermissionIfNeeded()
+            await NotificationManager.schedule(for: ticket)
+        }
+        savedTicket = ticket
+        resetForm()
+    }
+
+    private func resetForm() {
         number = ""
         zone = ""
         location = ""
@@ -199,10 +293,22 @@ struct AddTicketView: View {
         code = "821"
         issueDate = Date()
         paidAnswer = .paid
+        fineNow = DetroitFacts.code821DiscountFine
+        fineLater = DetroitFacts.code821FullFine
+        frontPhotoData = nil
+        backPhotoData = nil
+        photoMessage = nil
+    }
+}
+
+private extension Double {
+    func rounded(toPlaces places: Int) -> Double {
+        let divisor = pow(10.0, Double(places))
+        return (self * divisor).rounded() / divisor
     }
 }
 
 #Preview {
     AddTicketView()
-        .modelContainer(for: Ticket.self, inMemory: true)
+        .modelContainer(for: [Ticket.self, EvidenceItem.self], inMemory: true)
 }

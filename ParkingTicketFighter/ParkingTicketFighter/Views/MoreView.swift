@@ -175,7 +175,7 @@ struct FilingInstructionsStub: View {
                                 .foregroundStyle(.ink.opacity(0.7))
                         }
                     }
-                    StubBanner(note: "The per-ticket filing checklist and mark-as-filed step arrive with the packet pass.")
+                    StubBanner(note: "The per-ticket filing checklist is on the ticket detail screen, with mark-as-filed and the packet preview.")
                 }
                 .padding()
             }
