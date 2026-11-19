@@ -208,14 +208,26 @@ registered in the City's Detroit Discount program.
 
 ## Core fight flow built (Nov 18, 2026)
 
-Built in the VM, NOT compile verified: no Xcode or Swift compiler on
-the VM, and Risha's Mac was offline. First build on her Mac is the
-deciding check. What was verified here instead: every Swift file
-balances (braces, parens, brackets, string interpolations), no em
-dashes in app copy, no stale references to removed code, and the
-project file lists every new file in all four places (file reference,
-build file, group, sources phase) with balanced braces. Camera and
-photo library usage descriptions were added to both build configs.
+VERIFIED Nov 19, 2026: pulled and built on Risha's Mac in Xcode,
+build succeeded, app runs on the iPhone 17 Pro simulator. Save test
+passed: a test ticket (Y99999999) saved, persisted after close and
+reopen, then was deleted. Full case check works: WORTH FILING verdict
+with correct deadline math (issued Nov 19, pay $22.50 by Nov 24,
+contest by Dec 19). Notification permission prompt fires at first
+ticket save. UI bug found Nov 19: Add Ticket photo buttons wrap
+awkwardly ("Choose from library" breaks across lines), needs a layout
+fix. OCR still must be verified with a real ticket photo before any
+claim it works.
+
+Built in the VM, NOT compile verified at the time: no Xcode or Swift
+compiler on the VM, and Risha's Mac was offline. First build on her
+Mac was the deciding check. What was verified in the VM instead:
+every Swift file balances (braces, parens, brackets, string
+interpolations), no em dashes in app copy, no stale references to
+removed code, and the project file lists every new file in all four
+places (file reference, build file, group, sources phase) with
+balanced braces. Camera and photo library usage descriptions were
+added to both build configs.
 
 - Photo capture (S3): front and back slots on Add Ticket and on ticket
   detail, camera plus photo library. Photos are downscaled to 2000px
