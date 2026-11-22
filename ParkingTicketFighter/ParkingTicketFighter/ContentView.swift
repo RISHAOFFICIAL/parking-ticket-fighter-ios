@@ -85,6 +85,10 @@ struct ContentView: View {
     /// square in the exact center. Every tab keeps a short label under
     /// its icon. The selected tab is ink black; the others are a muted
     /// ink. The bar is in the layout flow, so it never covers content.
+    /// The paper background extends through the bottom safe area to the
+    /// bottom edge of the screen, so there is no blank strip under the
+    /// bar (Risha, Nov 22, 2026); the icons stay above the home
+    /// indicator, the way a standard tab bar sits.
     private var customTabBar: some View {
         VStack(spacing: 0) {
             Rectangle()
@@ -106,8 +110,8 @@ struct ContentView: View {
             .padding(.horizontal, 4)
             .padding(.top, 8)
             .padding(.bottom, 8)
-            .background(Color.paper)
         }
+        .background(Color.paper.ignoresSafeArea(edges: .bottom))
     }
 
     private var centerCameraTab: some View {
