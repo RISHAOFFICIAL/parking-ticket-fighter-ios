@@ -74,7 +74,9 @@ struct CameraPicker: UIViewControllerRepresentable {
 /// One photo slot (front or back of the ticket, or an evidence photo).
 /// Shows the attached photo when there is one, with Take photo and
 /// Choose from library buttons. A photo that cannot be read stays
-/// attached as evidence either way.
+/// attached as evidence either way. The two buttons stack full-width,
+/// one above the other (Risha, Nov 22, 2026): side by side they were
+/// too narrow and the labels wrapped badly ("Choo se from li- brary").
 struct PhotoSlotView: View {
     let title: String
     let photoData: Data?
@@ -101,7 +103,7 @@ struct PhotoSlotView: View {
                     .frame(maxHeight: 220)
                     .border(Color.ink.opacity(0.2), width: 1)
             }
-            HStack(spacing: 12) {
+            VStack(spacing: 12) {
                 if cameraAvailable {
                     AppSecondaryButton(title: photoData == nil ? "Take a photo" : "Retake", systemImage: "camera.fill") {
                         showingCamera = true
