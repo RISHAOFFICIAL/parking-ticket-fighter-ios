@@ -25,6 +25,17 @@ untracked and was deliberately NOT committed; the repo has no
 .gitignore. Pushes from her Mac will keep failing until a GitHub
 personal access token is set up in Xcode.
 
+Tab bar bottom edge (Nov 22, 2026): Risha asked about the white
+space below the tab bar; it was the iPhone home indicator safe area,
+empty because the custom tab bar stopped above it. Fixed in commit
+680a8ba: the tab bar's paper background now extends through the
+bottom safe area to the bottom edge (ignoresSafeArea, bottom edge
+only); the icons stay above the home indicator. VERIFIED Nov 22,
+2026 on her Mac: pulled, build succeeded with no errors, app ran on
+the iPhone 17 Pro simulator, screenshot confirms the white runs
+seamlessly from the tab bar to the bottom edge with no seam.
+Screenshot saved in 07-native/verification/.
+
 What the app should do, from the approved design: Stage 2 user stories (20),
 Stage 3 flow (S1 to S21), Stage 6 build spec. Written Nov 8, 2026, after Risha
 asked for the full list. Prices and the discount rule use the current plan:
