@@ -6,7 +6,12 @@ stays, but two moments go dark, using the landing page closing
 section's colors (warm near-black #16130e, paper text, bright
 pink-red #ff5b74 for deadlines on dark): the Home money at risk card
 and the case check verdict panel. The landing page hero went dark the
-same day; the closing was already dark.
+same day; the closing was already dark. VERIFIED Nov 22, 2026 on her
+Mac: pulled latest (stash-and-pull for her uncommitted pbxproj
+destination change, re-applied after), build succeeded with no
+errors, app ran on the iPhone 17 Pro simulator, both dark panels
+confirmed on screen by screenshot. Screenshots saved in
+07-native/verification/.
 
 What the app should do, from the approved design: Stage 2 user stories (20),
 Stage 3 flow (S1 to S21), Stage 6 build spec. Written Nov 8, 2026, after Risha
