@@ -13,6 +13,18 @@ errors, app ran on the iPhone 17 Pro simulator, both dark panels
 confirmed on screen by screenshot. Screenshots saved in
 07-native/verification/.
 
+Destinations change committed and pushed (Nov 22, 2026): the
+long-uncommitted pbxproj change (iPhone and iPad supported
+destinations, SUPPORTED_PLATFORMS plus SUPPORTS_MACCATALYST in Debug
+and Release) is now commit d3bf261 on origin/main. Xcode push from
+her Mac failed on authentication (GitHub credentials rejected), so
+the identical change was pushed from the VM instead; her Mac's local
+commit of the same change was retired and her branch reset to
+origin/main. Her Mac is now clean on main. The .DS_Store file is
+untracked and was deliberately NOT committed; the repo has no
+.gitignore. Pushes from her Mac will keep failing until a GitHub
+personal access token is set up in Xcode.
+
 What the app should do, from the approved design: Stage 2 user stories (20),
 Stage 3 flow (S1 to S21), Stage 6 build spec. Written Nov 8, 2026, after Risha
 asked for the full list. Prices and the discount rule use the current plan:
