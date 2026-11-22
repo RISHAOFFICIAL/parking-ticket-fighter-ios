@@ -1,6 +1,13 @@
 # Beat the Meter, functionality list
 Renamed Nov 9, 2026: the app is now called Beat the Meter (was Parking Ticket Fighter).
 
+Option A dark moments (Nov 22, 2026): the light Editorial Brief base
+stays, but two moments go dark, using the landing page closing
+section's colors (warm near-black #16130e, paper text, bright
+pink-red #ff5b74 for deadlines on dark): the Home money at risk card
+and the case check verdict panel. The landing page hero went dark the
+same day; the closing was already dark.
+
 What the app should do, from the approved design: Stage 2 user stories (20),
 Stage 3 flow (S1 to S21), Stage 6 build spec. Written Nov 8, 2026, after Risha
 asked for the full list. Prices and the discount rule use the current plan:
