@@ -36,6 +36,15 @@ the iPhone 17 Pro simulator, screenshot confirms the white runs
 seamlessly from the tab bar to the bottom edge with no seam.
 Screenshot saved in 07-native/verification/.
 
+Photo buttons fixed (Nov 22, 2026): the Add Ticket photo buttons
+("Take a photo", "Choose from library") sat side by side and the
+labels wrapped badly ("Choo se from li- brary"). Fixed in commit
+5c31d43: the buttons stack full-width, one above the other.
+VERIFIED Nov 22, 2026 on her Mac: pulled, build succeeded with no
+errors, app ran on the iPhone 17 Pro simulator, Add Ticket screen
+shows both labels on one line. Screenshot saved in
+07-native/verification/.
+
 What the app should do, from the approved design: Stage 2 user stories (20),
 Stage 3 flow (S1 to S21), Stage 6 build spec. Written Nov 8, 2026, after Risha
 asked for the full list. Prices and the discount rule use the current plan:

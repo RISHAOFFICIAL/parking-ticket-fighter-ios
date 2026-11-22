@@ -24,7 +24,7 @@ The idea is fine. Apps that fight tickets are already on the App Store (DoNotPay
 
 - [ ] Remove the sample ticket seed. The three sample tickets (Y18973750, Y18981274, Y18776021, plate 7PAC20) load on first launch. A real user must never see someone else's tickets. (ContentView.swift, seedSampleTicketsIfNeeded. Delete before release.)
 - [ ] Finish or hide the placeholder screens. Apple rejects apps with unfinished screens you can tap into. The stubs today: S1 Welcome, S11 Pay, S16 Duplicate review, S17 Fleet setup, S18 Driver invite, S19 Fleet dashboard, S20 Bulk packets, S21 Monthly report. Either build them or remove the routes to them before submission.
-- [ ] Fix the Add Ticket photo buttons. "Take a photo" and "Choose from library" sit side by side and the labels wrap badly ("Choo se from li- brary"). Fix prepared Nov 22: stack them full-width, one above the other. (PhotoCapture.swift. The change is ready on the VM, uncommitted. It needs her yes to commit, push, and verify on her Mac.)
+- [x] Fix the Add Ticket photo buttons. "Take a photo" and "Choose from library" sat side by side and the labels wrapped badly ("Choo se from li- brary"). DONE Nov 22 (commit 5c31d43): the buttons stack full-width, one above the other. Verified on her Mac the same day: build clean, Add Ticket screen shows both labels on one line. Screenshot in 07-native/verification/2026-11-22-photo-buttons-stacked.jpg.
 
 ### Must prove before claiming it works
 
