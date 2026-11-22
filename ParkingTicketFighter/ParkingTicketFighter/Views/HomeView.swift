@@ -122,25 +122,28 @@ struct HomeView: View {
         }
     }
 
-    /// Money at risk and the nearest deadline, on a brief panel with
-    /// a thick black top rule. The amount is large serif with tabular
-    /// numerals. The deadline is red marginalia.
+    /// Money at risk and the nearest deadline, on a dark panel
+    /// (Option A, November 22, 2026). Warm near-black ground, paper
+    /// text, the deadline in bright pink-red. The amount is large
+    /// serif with tabular numerals.
     private var summaryPanel: some View {
-        BriefPanel {
+        DarkBriefPanel {
             VStack(alignment: .leading, spacing: 8) {
-                Kicker(text: "Money at risk")
+                Kicker(text: "Money at risk", dark: true)
                 Text(Money.format(totalAtRisk))
                     .font(.briefTitle(40, relativeTo: .largeTitle))
                     .monospacedDigit()
+                    .foregroundStyle(.paper)
                 if let next = openTickets.min(by: { $0.contestDeadline < $1.contestDeadline }) {
-                    DeadlineCaps(text: "Contest by \(next.contestDeadline.formatted(date: .abbreviated, time: .omitted)) for ticket \(next.number)")
+                    DeadlineCaps(text: "Contest by \(next.contestDeadline.formatted(date: .abbreviated, time: .omitted)) for ticket \(next.number)", dark: true)
                 }
                 Text("\(openTickets.count) open ticket(s). Filing freezes penalties while you wait on a result.")
                     .font(.footnote)
-                    .foregroundStyle(.ink.opacity(0.7))
+                    .foregroundStyle(.paper.opacity(0.7))
                 if totalSaved > 0 {
                     Text("Lifetime saved: \(Money.format(totalSaved)).")
                         .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.paper)
                 }
             }
         }

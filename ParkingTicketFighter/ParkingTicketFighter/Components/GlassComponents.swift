@@ -11,6 +11,12 @@ import SwiftUI
 /// with white text and square corners. Status is small caps text, not
 /// pills. Deadlines are red marginalia, not badges. The theme is
 /// locked to light (paper white always, even in device dark mode).
+///
+/// Option A, chosen by Risha November 22, 2026: the light base stays,
+/// but two moments go dark, using the landing page closing section's
+/// colors: the money at risk card on Home and the case check verdict.
+/// Dark panels use warm near-black ink with paper text and a bright
+/// pink-red for deadlines on dark.
 enum AppTheme {
     /// Paper white, the only background. #ffffff.
     static let paper = Color(red: 1.0, green: 1.0, blue: 1.0)
@@ -19,12 +25,20 @@ enum AppTheme {
     /// Signal red, the one accent. #c8102e. Deadlines, money at risk,
     /// and urgent flags only. Never used as body text.
     static let signal = Color(red: 0.784, green: 0.063, blue: 0.180)
+    /// Dark panel ink, the warm near-black from the landing page
+    /// closing section. #16130e. The ground for dark moments only.
+    static let darkPanel = Color(red: 0.086, green: 0.075, blue: 0.055)
+    /// Bright signal for text on dark panels. #ff5b74, the pink-red
+    /// from the landing page closing section. Deadlines on dark only.
+    static let signalBright = Color(red: 1.0, green: 0.357, blue: 0.455)
 }
 
 extension Color {
     static let paper = AppTheme.paper
     static let ink = AppTheme.ink
     static let signal = AppTheme.signal
+    static let darkPanel = AppTheme.darkPanel
+    static let signalBright = AppTheme.signalBright
 }
 
 /// The same brand colors as ShapeStyle, so they work in
@@ -33,6 +47,8 @@ extension ShapeStyle where Self == Color {
     static var paper: Color { AppTheme.paper }
     static var ink: Color { AppTheme.ink }
     static var signal: Color { AppTheme.signal }
+    static var darkPanel: Color { AppTheme.darkPanel }
+    static var signalBright: Color { AppTheme.signalBright }
 }
 
 // MARK: - Typography
@@ -49,41 +65,45 @@ extension Font {
 }
 
 /// A small caps kicker with letterspacing, for section and screen
-/// labels, e.g. "THE BRIEF".
+/// labels, e.g. "THE BRIEF". Pass dark: true on a dark panel.
 struct Kicker: View {
     let text: String
+    var dark: Bool = false
 
     var body: some View {
         Text(text.uppercased())
             .font(.caption.weight(.semibold))
             .tracking(1.5)
-            .foregroundStyle(.ink)
+            .foregroundStyle(dark ? Color.paper : Color.ink)
     }
 }
 
 /// Status stated in small caps text, never a pill or chip,
-/// e.g. "FILED, WAITING ON RESULT".
+/// e.g. "FILED, WAITING ON RESULT". Pass dark: true on a dark panel.
 struct StatusCaps: View {
     let text: String
+    var dark: Bool = false
 
     var body: some View {
         Text(text.uppercased())
             .font(.caption.weight(.semibold))
             .tracking(1.0)
-            .foregroundStyle(.ink)
+            .foregroundStyle(dark ? Color.paper : Color.ink)
     }
 }
 
 /// A deadline as red marginalia: bold red, never a soft badge,
-/// e.g. "CONTEST BY NOV 8".
+/// e.g. "CONTEST BY NOV 8". Pass dark: true on a dark panel,
+/// where it uses the bright pink-red instead of signal red.
 struct DeadlineCaps: View {
     let text: String
+    var dark: Bool = false
 
     var body: some View {
         Text(text.uppercased())
             .font(.footnote.weight(.bold))
             .tracking(0.5)
-            .foregroundStyle(.signal)
+            .foregroundStyle(dark ? Color.signalBright : Color.signal)
     }
 }
 
@@ -185,6 +205,30 @@ struct BriefPanel<Content: View>: View {
         .overlay(
             Rectangle()
                 .strokeBorder(Color.ink.opacity(0.15), lineWidth: 1)
+        )
+    }
+}
+
+/// A dark brief panel: the mirror of BriefPanel for the two dark
+/// moments (Option A, November 22, 2026). Warm near-black ground
+/// with a 6px paper top rule. Content sits on ink, in paper.
+/// Used for the money at risk card and the case check verdict.
+struct DarkBriefPanel<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Rectangle()
+                .fill(Color.paper)
+                .frame(height: 6)
+            content
+                .padding(16)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.darkPanel)
+        .overlay(
+            Rectangle()
+                .strokeBorder(Color.paper.opacity(0.15), lineWidth: 1)
         )
     }
 }

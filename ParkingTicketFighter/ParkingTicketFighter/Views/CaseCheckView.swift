@@ -73,13 +73,16 @@ struct CaseCheckView: View {
         }
     }
 
+    /// The verdict on a dark panel (Option A, November 22, 2026).
+    /// Warm near-black ground, paper text, the verdict in paper caps.
     private var verdictPanel: some View {
-        BriefPanel {
+        DarkBriefPanel {
             VStack(alignment: .leading, spacing: 8) {
-                Kicker(text: "Case check, ticket \(ticket.number)")
-                StatusCaps(text: ticket.verdict.rawValue)
+                Kicker(text: "Case check, ticket \(ticket.number)", dark: true)
+                StatusCaps(text: ticket.verdict.rawValue, dark: true)
                 Text(check.reason)
                     .font(.subheadline)
+                    .foregroundStyle(.paper)
             }
         }
     }
